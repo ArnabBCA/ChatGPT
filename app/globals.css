@@ -114,6 +114,8 @@
   --sidebar-ring: oklch(0.556 0 0);
 
   --sidebar-chatgpt-border: #131313;
+  --menu-button-highlighted: #ffffff1a;
+  --menu-button-hover: #ffffff0d;
 }
 
 @layer base {
@@ -123,4 +125,8 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.header-height {
+  height: calc(0.25rem * 13);
 }
