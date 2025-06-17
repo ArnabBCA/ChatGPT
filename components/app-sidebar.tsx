@@ -16,7 +16,7 @@ export function AppSidebar() {
         <Button
           size={"icon"}
           variant={"ghost"}
-          className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-[var(--menu-button-highlighted)]"
+          className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-200/70 dark:hover:!bg-neutral-700/80"
         >
           <Logo size={24} />
         </Button>
