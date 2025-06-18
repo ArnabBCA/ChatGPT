@@ -1,4 +1,3 @@
-
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import SlidersIcon from "../icons/sliders-icon";
@@ -6,10 +5,12 @@ import PlusIcon from "../icons/plus-icon";
 import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
 
+//min-[510px]:mt-[25dvh] max-[768px]:mt-[25dvh] lg:mt-[calc(30dvh+25px)]
+
 export default function Chatbox() {
   return (
     <div className="flex w-full flex-col max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] items-center mb-4">
-      <h1 className="text-2xl leading-9 font-semibold mb-7 text-page-header min-h-10.5 min-[510px]:mt-[25dvh] max-[768px]:mt-[25dvh] lg:mt-[calc(30dvh+25px)]">
+      <h1 className="text-2xl leading-9 font-semibold mb-7 text-page-header min-h-10.5 min-[510px]:mt-[cal(25dvh-52px)] max-[768px]:mt-[cal(25dvh-52px)] lg:mt-[calc(30dvh-27px)]">
         What are you working on?
       </h1>
       <div className="w-full rounded-[28px] overflow-hidden p-2.5 dark:bg-[#303030] shadow-short">
