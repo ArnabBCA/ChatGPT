@@ -65,6 +65,15 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+.markdown p {
+  margin-bottom: 0.5rem;
+}
+
+.markdown p:not(:first-child) {
+  margin-top: 0.5rem;
+}
+
+
 :root {
   --radius: 0.625rem;
   --background: #fff /*oklch(1 0 0)*/;

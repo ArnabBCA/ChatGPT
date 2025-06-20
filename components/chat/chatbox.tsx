@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
@@ -8,21 +9,32 @@ import SlidersIcon from "../icons/sliders-icon";
 import PlusIcon from "../icons/plus-icon";
 import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
-import { usePathname } from "next/navigation";
 import { useChatboxStore } from "@/store/chatbox-store";
 import { cn } from "@/lib/utils";
 
 export default function Chatbox() {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const slideToBottom = useChatboxStore((state) => state.slideToBottom);
-  const fixedToBottom = useChatboxStore((state) => state.fixedToBottom);
-  const setSlideToBottom = useChatboxStore((state) => state.setSlideToBottom);
-  const setFixedToBottom = useChatboxStore((state) => state.setFixedToBottom);
+  const {
+    input,
+    setInput,
+    setPendingMessage,
+    slideToBottom,
+    fixedToBottom,
+    setSlideToBottom,
+    setFixedToBottom,
+  } = useChatboxStore();
 
   const handleSubmit = () => {
-    window.history.pushState(null, "", "/c/rgre"); // Reset to home route
+    const trimmed = input.trim();
+    if (!trimmed) return;
+
+    setPendingMessage(trimmed);
+    setInput("");
     setSlideToBottom(true);
+
+    router.push(`/c/33`);
   };
 
   // Set correct bottom state on mount depending on path
@@ -31,7 +43,6 @@ export default function Chatbox() {
       setSlideToBottom(false);
       setFixedToBottom(false);
     } else {
-      // For other routes, fix chatbox at bottom (no animation)
       setSlideToBottom(false);
       setFixedToBottom(true);
     }
@@ -40,7 +51,7 @@ export default function Chatbox() {
   return (
     <motion.div
       className="absolute flex w-full flex-col max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] items-center mb-4"
-      initial={pathname === "/" ? { y: 0 } : { y: "calc(100vh - 100% - 80px)" }} // ⛔ no initial style when fixedToBottom
+      initial={pathname === "/" ? { y: 0 } : { y: "calc(100vh - 100% - 80px)" }}
       animate={
         slideToBottom
           ? { y: "calc(100vh - 100% - 80px)" }
@@ -49,12 +60,12 @@ export default function Chatbox() {
           : { y: 0 }
       }
       transition={
-        slideToBottom ? { type: "tween", duration: 0.20 } : { duration: 0 }
+        slideToBottom ? { type: "tween", duration: 0.2 } : { duration: 0 }
       }
       onAnimationComplete={() => {
         if (slideToBottom) {
-          setSlideToBottom(false); // Optional: reset animation trigger
-          setFixedToBottom(true); // ✅ Fix position now
+          setSlideToBottom(false);
+          setFixedToBottom(true);
         }
       }}
     >
@@ -71,6 +82,14 @@ export default function Chatbox() {
         <Textarea
           className="w-full border-none focus-visible:border-none focus-visible:ring-0 shadow-none !bg-transparent pb-0 pt-[7px] px-3 pl-[11px] min-h-12 !text-[16px] font-normal hide-resizer placeholder:font-normal"
           placeholder="Ask anything"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
         />
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-[1px]">
