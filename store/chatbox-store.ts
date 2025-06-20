@@ -14,6 +14,9 @@ interface ChatboxState {
   fixedToBottom: boolean;
   setSlideToBottom: (value: boolean) => void;
   setFixedToBottom: (value: boolean) => void;
+
+  isSubmited: boolean;
+  setIsSubmited: (value: boolean) => void;
 }
 
 export const useChatboxStore = create<ChatboxState>()(
@@ -29,6 +32,9 @@ export const useChatboxStore = create<ChatboxState>()(
       fixedToBottom: false,
       setSlideToBottom: (value) => set({ slideToBottom: value }),
       setFixedToBottom: (value) => set({ fixedToBottom: value }),
+
+      isSubmited: false,
+      setIsSubmited: (value) => set({ isSubmited: value }),
     }),
     {
       name: "chatbox-storage",

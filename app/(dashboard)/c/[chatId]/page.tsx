@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useChatboxStore } from "@/store/chatbox-store";
 import { useParams } from "next/navigation";
@@ -10,6 +10,7 @@ import remarkGfm from "remark-gfm";
 
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { cn } from "@/lib/utils";
 
 export default function ChatId() {
   const { chatId } = useParams();
@@ -17,6 +18,8 @@ export default function ChatId() {
     api: "/api/chat",
     id: Array.isArray(chatId) ? chatId[0] : chatId,
   });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
   const pendingMessage = useChatboxStore((state) => state.pendingMessage);
   const setPendingMessage = useChatboxStore((state) => state.setPendingMessage);
@@ -35,8 +38,28 @@ export default function ChatId() {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current) {
+        const el = containerRef.current;
+        console.log(el.scrollHeight > el.clientHeight);
+        setIsOverflowing(el.scrollHeight > el.clientHeight);
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [messages]);
+
   return (
-    <div className="flex flex-col w-full items-center h-[calc(100vh-10rem)] overflow-y-auto py-5 px-[calc(0.25rem*6)] pb-25 outline-0 ring-0">
+    <div
+      ref={containerRef}
+      className={cn(
+        "flex flex-col w-full items-center h-[calc(100vh-10rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0",
+        isOverflowing ? "pr-2 pl-6" : "px-6"
+      )}
+    >
       <div className="flex flex-col gap-10 h-full w-full max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem]">
         {messages.map((msg, i) => (
           <div

@@ -50,13 +50,13 @@ export default function Chatbox() {
 
   return (
     <motion.div
-      className="absolute flex w-full flex-col max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] items-center mb-4"
-      initial={pathname === "/" ? { y: 0 } : { y: "calc(100vh - 100% - 80px)" }}
+      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex w-full flex-col max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] items-center mt-[-25px]"
+      initial={pathname === "/" ? { y: 0 } : { y: "calc(100vh - 450px)" }}
       animate={
         slideToBottom
-          ? { y: "calc(100vh - 100% - 80px)" }
+          ? { y: "calc(100vh - 450px)" }
           : fixedToBottom
-          ? { y: "calc(100vh - 100% - 80px)" }
+          ? { y: "calc(100vh - 450px)" }
           : { y: 0 }
       }
       transition={
@@ -69,15 +69,6 @@ export default function Chatbox() {
         }
       }}
     >
-      <h1
-        className={cn(
-          "text-2xl leading-9 font-semibold mb-7 text-page-header min-h-10.5 min-[510px]:mt-[cal(25dvh-52px)] max-[768px]:mt-[cal(25dvh-52px)] lg:mt-[calc(30dvh-27px)]",
-          pathname !== "/" && "invisible"
-        )}
-      >
-        What are you working on?
-      </h1>
-
       <div className="w-full rounded-[28px] overflow-hidden p-2.5 dark:bg-[#303030] shadow-short">
         <Textarea
           className="w-full border-none focus-visible:border-none focus-visible:ring-0 shadow-none !bg-transparent pb-0 pt-[7px] px-3 pl-[11px] min-h-12 !text-[16px] font-normal hide-resizer placeholder:font-normal"
