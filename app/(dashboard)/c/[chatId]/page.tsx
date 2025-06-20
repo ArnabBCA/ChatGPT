@@ -61,7 +61,6 @@ export default function ChatId() {
                         customStyle={{
                           borderRadius: "0.75rem",
                           padding: "1rem",
-                          width: "100%",
                           backgroundColor: "#171717",
                         }}
                       >
@@ -69,7 +68,7 @@ export default function ChatId() {
                       </SyntaxHighlighter>
                     ) : (
                       <code
-                        className="bg-muted px-1 py-0.5 rounded text-sm font-mono"
+                        className="dark:bg-[#424242] px-[0.3rem] py-[0.15rem] rounded text-sm font-mono"
                         {...props}
                       >
                         {children}
