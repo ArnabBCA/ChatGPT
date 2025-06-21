@@ -73,6 +73,30 @@
   margin-top: 0.5rem;
 }
 
+.hover-with-ellipsis:hover .hover-with-ellipsis\:hover\:opacity-100 {
+  opacity: 1;
+}
+
+.shadow-long:is(.dark *) {
+  --tw-shadow: 0px 8px 16px 0px var(--tw-shadow-color, #00000052),
+    0px 0px 1px 0px var(--tw-shadow-color, #0000009e);
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+    var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+.shadow-long {
+  --tw-shadow: 0px 8px 12px 0px
+      var(--tw-shadow-color, var(--shadow-color-1, #00000014)),
+    0px 0px 1px 0px var(--tw-shadow-color, var(--shadow-color-2, #0000009e));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow),
+    var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+@media (max-width: 414px) {
+  .custom-414-mt {
+    margin-top: -40px;
+  }
+}
 
 :root {
   --radius: 0.625rem;

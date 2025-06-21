@@ -9,44 +9,14 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import Logo from "./icons/logo-icon";
-import { Button } from "./ui/button";
+import Logo from "../icons/logo-icon";
+import { Button } from "../ui/button";
 
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 import { useChatboxStore } from "@/store/chatbox-store";
 import Link from "next/link";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
+import CustomSidebarMenuItem from "./cutom-sidebar-menu-item";
 
 export function AppSidebar() {
   const chats = useChatboxStore((state) => state.chats);
@@ -68,20 +38,9 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem className="mx-1.5 py-2 px-2.5 min-h-9 text-sm overflow-ellipsis text-muted-foreground">
-              Chats
-            </SidebarMenuItem>
+            <CustomSidebarMenuItem text="Chats" />
             {chats.map((chat) => (
-              <SidebarMenuItem key={chat.chatId} className="mx-1.5">
-                <Link href={`/c/${chat.chatId}`}>
-                  <SidebarMenuButton
-                    asChild
-                    className="py-2 px-2.5 min-h-9 text-sm overflow-ellipsis"
-                  >
-                    <span>{chat.title || "New Chat"}</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
+              <CustomSidebarMenuItem chat={chat} key={chat.chatId} />
             ))}
           </SidebarMenu>
         </SidebarGroupContent>

@@ -113,7 +113,7 @@ export default function ChatId() {
             key={i}
             className={`whitespace-pre-wrap w-full prose prose-neutral dark:prose-invert ${
               msg.role === "user"
-                ? "self-end px-5 pt-2.5 pb-1 dark:bg-[#323232d9] dark:text-white rounded-3xl mb-[42px] max-w-max "
+                ? "self-end px-5 pt-2.5 pb-1 dark:bg-[#323232d9] dark:text-white rounded-3xl mb-[42px] max-w-max wrap-anywhere"
                 : "self-start"
             }`}
           >

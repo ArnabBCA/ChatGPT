@@ -59,7 +59,7 @@ export default function Chatbox() {
 
   return (
     <motion.div
-      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex w-full flex-col max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] items-center mt-[-25px]"
+      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex w-full flex-col max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] items-center mt-[-25px] custom-414-mt"
       initial={pathname === "/" ? { y: 0 } : { y: "calc(100vh - 450px)" }}
       animate={
         slideToBottom
