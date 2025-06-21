@@ -84,6 +84,9 @@ export default function ChatId() {
         role: "user",
         content: userInput,
       });
+      if (scrollRef.current) {
+        scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      }
       setUserInput(""); // Clear input after appending
     }
   }, [userInput]);
@@ -105,16 +108,9 @@ export default function ChatId() {
   }, [messages, oldMessages]);
 
   useEffect(() => {
-    // First load: instant scroll (no flicker)
-    if (!initialScrollDone && scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "auto" });
-      setInitialScrollDone(true);
-    }
-
-    // Later updates: smooth scroll
-    if (initialScrollDone && scrollRef.current) {
+    /*if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    }*/
 
     const checkOverflow = () => {
       if (containerRef.current) {
@@ -128,6 +124,13 @@ export default function ChatId() {
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
   }, [allMessages]);
+
+  useEffect(() => {
+    if (!loading && scrollRef.current) {
+      console.log("Loading finished, scrolling to bottom");
+      scrollRef.current.scrollIntoView({ behavior: "instant" });
+    }
+  }, [loading]);
 
   return (
     <div
@@ -194,7 +197,13 @@ export default function ChatId() {
               {msg.role !== "user" && <AiMessageActionButtons />}
             </div>
           ))}
-          <div ref={scrollRef} className="w-full pb-25"></div>
+          <div
+            ref={scrollRef}
+            className={cn(
+              "w-full pb-[calc(100vh-300px)]",
+              messages.length > 2 ? "pb-[calc(100vh-300px)]" : "pb-25"
+            )}
+          ></div>
         </div>
       )}
     </div>
