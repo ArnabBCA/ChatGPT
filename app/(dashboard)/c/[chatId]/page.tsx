@@ -12,6 +12,7 @@ import { useChat } from "@ai-sdk/react";
 import { useChatboxStore } from "@/store/chatbox-store";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
+import AiMessageActionButtons from "@/components/chat/ai-meesage-action-buttons";
 
 export default function ChatId() {
   const { chatId } = useParams();
@@ -103,11 +104,11 @@ export default function ChatId() {
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col w-full items-center h-[calc(100vh-10rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0",
+        "flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0",
         isOverflowing ? "pr-2 pl-6" : "px-6"
       )}
     >
-      <div className="flex flex-col gap-10 h-full w-full max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem]">
+      <div className="flex flex-col gap-10 h-full w-full max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] mt-1.5">
         {allMessages.map((msg, i) => (
           <div
             key={i}
@@ -158,6 +159,7 @@ export default function ChatId() {
                 {msg.content}
               </ReactMarkdown>
             </div>
+            {msg.role !== "user" && <AiMessageActionButtons />}
           </div>
         ))}
         <div ref={scrollRef} className="w-full pb-25"></div>
