@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const chats = await chatsCollection.find({ userId }).toArray();
 
-    return Response.json(chats);
+    return Response.json(chats || [], { status: 200 });
   } catch (err) {
     console.error("Failed to fetch chats:", err);
     return new Response("Failed to fetch chats", { status: 500 });

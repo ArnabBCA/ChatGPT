@@ -7,6 +7,9 @@ interface ChatboxState {
   userInput: string | null;
   setUserInput: (value: string | null) => void;
 
+  chats: any[];
+  setChats: (chats: any[]) => void;
+
   slideToBottom: boolean;
   fixedToBottom: boolean;
   setSlideToBottom: (value: boolean) => void;
@@ -21,6 +24,9 @@ export const useChatboxStore = create<ChatboxState>()(
     (set) => ({
       userInput: null,
       setUserInput: (value) => set({ userInput: value }),
+
+      chats: [],
+      setChats: (chats) => set({ chats }),
 
       slideToBottom: false,
       fixedToBottom: false,
