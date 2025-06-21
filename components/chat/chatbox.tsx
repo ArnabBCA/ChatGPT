@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
@@ -10,7 +10,7 @@ import PlusIcon from "../icons/plus-icon";
 import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
 import { useChatboxStore } from "@/store/chatbox-store";
-import { cn } from "@/lib/utils";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Chatbox() {
   const pathname = usePathname();
@@ -26,7 +26,7 @@ export default function Chatbox() {
     setFixedToBottom,
   } = useChatboxStore();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const trimmed = input.trim();
     if (!trimmed) return;
 
@@ -34,7 +34,14 @@ export default function Chatbox() {
     setInput("");
     setSlideToBottom(true);
 
-    router.push(`/c/33`);
+    let finalChatId = pathname.startsWith("/c/")
+      ? pathname.split("/c/")[1]
+      : null;
+
+    if (!finalChatId) {
+      finalChatId = uuidv4();
+      router.push(`/c/${finalChatId}`);
+    }
   };
 
   // Set correct bottom state on mount depending on path

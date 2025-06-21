@@ -14,9 +14,10 @@ import { cn } from "@/lib/utils";
 
 export default function ChatId() {
   const { chatId } = useParams();
+  if (!chatId) return;
   const { messages, append } = useChat({
     api: "/api/chat",
-    id: Array.isArray(chatId) ? chatId[0] : chatId,
+    id: chatId.toString(),
   });
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -26,12 +27,18 @@ export default function ChatId() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (pendingMessage) {
-      console.log("Appending pending message:", pendingMessage);
-      append({ role: "user", content: pendingMessage });
-      setPendingMessage(null);
+  const appendMessage = (message: string | null) => {
+    if (typeof message === "string" && message.trim() !== "") {
+      console.log("Appending message:", message);
+      append({
+        role: "user",
+        content: message,
+      });
     }
+  };
+
+  useEffect(() => {
+    appendMessage(pendingMessage);
   }, [pendingMessage]);
 
   useEffect(() => {
