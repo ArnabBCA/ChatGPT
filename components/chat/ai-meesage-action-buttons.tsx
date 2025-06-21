@@ -28,7 +28,7 @@ export default function AiMessageActionButtons() {
   ];
 
   return (
-    <div className="flex items-center mx-[-0.5rem] px-1 py-1.5">
+    <div className="flex items-center mx-[-0.7rem] px-1 py-1.5">
       {icons.map((icon, index) => (
         <motion.div
           key={index}
