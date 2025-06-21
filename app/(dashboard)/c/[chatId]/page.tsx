@@ -13,20 +13,24 @@ import { useChatboxStore } from "@/store/chatbox-store";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import AiMessageActionButtons from "@/components/chat/ai-meesage-action-buttons";
+import { set } from "zod";
 
 export default function ChatId() {
   const { chatId } = useParams();
   const router = useRouter();
+  const { setUserInput } = useChatboxStore();
 
   const [allMessages, setAllMessages] = useState<any[]>([]);
   const [oldMessages, setOldMessages] = useState<any[]>([]);
   const [isOverflowing, setIsOverflowing] = useState(false);
+  const [initialScrollDone, setInitialScrollDone] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const userInput = useChatboxStore((state) => state.userInput);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Prevent running if chatId is undefined (especially during SSR)
   if (!chatId || typeof chatId !== "string") return null;
 
   const { messages, append } = useChat({
@@ -38,7 +42,6 @@ export default function ChatId() {
     },
   });
 
-  // Validate chatId on mount
   useEffect(() => {
     const isValidChatId = async () => {
       try {
@@ -59,10 +62,15 @@ export default function ChatId() {
 
     const getOldMessages = async () => {
       try {
+        setLoading(true);
         const res = await axios.get(`/api/messages?chatId=${chatId}`);
         setOldMessages(res.data || []);
       } catch (error) {
         console.error("Failed to fetch old messages:", error);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 100); // Simulate loading delay
       }
     };
 
@@ -70,23 +78,43 @@ export default function ChatId() {
     getOldMessages();
   }, [chatId]);
 
-  // Append pending message
   useEffect(() => {
     if (userInput?.trim()) {
       append({
         role: "user",
         content: userInput,
       });
+      setUserInput(""); // Clear input after appending
     }
   }, [userInput]);
 
-  // Combine new and old messages into allMessages
-  useEffect(() => {
+  /*useEffect(() => {
+    console.log("Messages updated:", messages);
     setAllMessages([...oldMessages, ...messages]);
+  }, [oldMessages, messages]);*/
+
+  useEffect(() => {
+    const merged = [...oldMessages, ...messages];
+
+    // Remove duplicates by `id`, keeping the last occurrence
+    const unique = Array.from(
+      new Map(merged.map((msg) => [msg.id, msg])).values()
+    );
+
+    setAllMessages(unique);
   }, [messages, oldMessages]);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    // First load: instant scroll (no flicker)
+    if (!initialScrollDone && scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "auto" });
+      setInitialScrollDone(true);
+    }
+
+    // Later updates: smooth scroll
+    if (initialScrollDone && scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
 
     const checkOverflow = () => {
       if (containerRef.current) {
@@ -100,6 +128,7 @@ export default function ChatId() {
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
   }, [allMessages]);
+
   return (
     <div
       ref={containerRef}
@@ -108,62 +137,66 @@ export default function ChatId() {
         isOverflowing ? "pr-2 pl-6" : "px-6"
       )}
     >
-      <div className="flex flex-col gap-10 h-full w-full max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] mt-1.5">
-        {allMessages.map((msg, i) => (
-          <div
-            key={i}
-            className={`whitespace-pre-wrap w-full prose prose-neutral dark:prose-invert ${
-              msg.role === "user"
-                ? "self-end px-5 pt-2.5 pb-1 dark:bg-[#323232d9] dark:text-white rounded-3xl mb-[42px] max-w-max wrap-anywhere"
-                : "self-start"
-            }`}
-          >
-            <div className="markdown">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  code({ node, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || "");
-                    return match ? (
-                      <SyntaxHighlighter
-                        wrapLongLines={true}
-                        style={vscDarkPlus as any}
-                        language={match[1]}
-                        customStyle={{
-                          borderRadius: "0.75rem",
-                          padding: "1rem",
-                          backgroundColor: "#171717",
-                        }}
-                      >
-                        {String(children).replace(/\n$/, "")}
-                      </SyntaxHighlighter>
-                    ) : (
-                      <code
-                        className="dark:bg-[#424242] px-[0.3rem] py-[0.15rem] rounded text-sm font-mono"
+      {loading ? (
+        <span>Loading..</span>
+      ) : (
+        <div className="flex flex-col gap-10 h-full w-full max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem] mt-1.5">
+          {allMessages.map((msg, i) => (
+            <div
+              key={i}
+              className={`whitespace-pre-wrap w-full prose prose-neutral dark:prose-invert ${
+                msg.role === "user"
+                  ? "self-end px-5 pt-2.5 pb-1 dark:bg-[#323232d9] dark:text-white rounded-3xl mb-[42px] max-w-max wrap-anywhere"
+                  : "self-start"
+              }`}
+            >
+              <div className="markdown">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    code({ node, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || "");
+                      return match ? (
+                        <SyntaxHighlighter
+                          wrapLongLines={true}
+                          style={vscDarkPlus as any}
+                          language={match[1]}
+                          customStyle={{
+                            borderRadius: "0.75rem",
+                            padding: "1rem",
+                            backgroundColor: "#171717",
+                          }}
+                        >
+                          {String(children).replace(/\n$/, "")}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code
+                          className="dark:bg-[#424242] px-[0.3rem] py-[0.15rem] rounded text-sm font-mono"
+                          {...props}
+                        >
+                          {children}
+                        </code>
+                      );
+                    },
+                    a: ({ node, ...props }) => (
+                      <a
                         {...props}
-                      >
-                        {children}
-                      </code>
-                    );
-                  },
-                  a: ({ node, ...props }) => (
-                    <a
-                      {...props}
-                      className="text-blue-500 underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    />
-                  ),
-                }}
-              >
-                {msg.content}
-              </ReactMarkdown>
+                        className="text-blue-500 underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ),
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
+              </div>
+              {msg.role !== "user" && <AiMessageActionButtons />}
             </div>
-            {msg.role !== "user" && <AiMessageActionButtons />}
-          </div>
-        ))}
-        <div ref={scrollRef} className="w-full pb-25"></div>
-      </div>
+          ))}
+          <div ref={scrollRef} className="w-full pb-25"></div>
+        </div>
+      )}
     </div>
   );
 }
