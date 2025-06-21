@@ -4,11 +4,8 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface ChatboxState {
-  input: string;
-  setInput: (value: string) => void;
-
-  pendingMessage: string | null;
-  setPendingMessage: (value: string | null) => void;
+  userInput: string | null;
+  setUserInput: (value: string | null) => void;
 
   slideToBottom: boolean;
   fixedToBottom: boolean;
@@ -22,11 +19,8 @@ interface ChatboxState {
 export const useChatboxStore = create<ChatboxState>()(
   persist(
     (set) => ({
-      input: "",
-      setInput: (value) => set({ input: value }),
-
-      pendingMessage: null,
-      setPendingMessage: (value) => set({ pendingMessage: value }),
+      userInput: null,
+      setUserInput: (value) => set({ userInput: value }),
 
       slideToBottom: false,
       fixedToBottom: false,

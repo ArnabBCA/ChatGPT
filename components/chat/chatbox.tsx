@@ -13,14 +13,13 @@ import { useChatboxStore } from "@/store/chatbox-store";
 import axios from "axios";
 
 export default function Chatbox() {
+  const [input, setInput] = useState("");
   const pathname = usePathname();
   const { chatId } = useParams();
   const router = useRouter();
 
   const {
-    input,
-    setInput,
-    setPendingMessage,
+    setUserInput,
     slideToBottom,
     fixedToBottom,
     setSlideToBottom,
@@ -31,7 +30,7 @@ export default function Chatbox() {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    setPendingMessage(trimmed);
+    setUserInput(trimmed);
     setInput("");
     setSlideToBottom(true);
 

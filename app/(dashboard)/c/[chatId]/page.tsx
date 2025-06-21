@@ -14,14 +14,16 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 
 export default function ChatId() {
-  const [allMessages, setAllMessages] = useState<any[]>([]);
-  const [oldMessages, setOldMessages] = useState<any[]>([]);
   const { chatId } = useParams();
   const router = useRouter();
+
+  const [allMessages, setAllMessages] = useState<any[]>([]);
+  const [oldMessages, setOldMessages] = useState<any[]>([]);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const userInput = useChatboxStore((state) => state.userInput);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const pendingMessage = useChatboxStore((state) => state.pendingMessage);
 
   // Prevent running if chatId is undefined (especially during SSR)
   if (!chatId || typeof chatId !== "string") return null;
@@ -58,7 +60,6 @@ export default function ChatId() {
       try {
         const res = await axios.get(`/api/messages?chatId=${chatId}`);
         setOldMessages(res.data || []);
-        console.log("Fetched old messages:", res.data);
       } catch (error) {
         console.error("Failed to fetch old messages:", error);
       }
@@ -70,26 +71,22 @@ export default function ChatId() {
 
   // Append pending message
   useEffect(() => {
-    if (pendingMessage?.trim()) {
+    if (userInput?.trim()) {
       append({
         role: "user",
-        content: pendingMessage,
+        content: userInput,
       });
     }
-  }, [pendingMessage]);
+  }, [userInput]);
 
   // Combine new and old messages into allMessages
   useEffect(() => {
     setAllMessages([...oldMessages, ...messages]);
   }, [messages, oldMessages]);
 
-  // Auto scroll to bottom on new message
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [allMessages]);
 
-  // Detect overflow
-  useEffect(() => {
     const checkOverflow = () => {
       if (containerRef.current) {
         setIsOverflowing(
