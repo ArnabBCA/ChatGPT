@@ -10,7 +10,6 @@ import PlusIcon from "../icons/plus-icon";
 import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
 import { useChatboxStore } from "@/store/chatbox-store";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 export default function Chatbox() {

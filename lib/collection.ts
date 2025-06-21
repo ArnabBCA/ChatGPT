@@ -1,14 +1,13 @@
 // lib/collections.ts
-import { Message, Chat } from "@/types/types";
 import { getDb } from "./mongodb";
 import { Collection } from "mongodb";
 
-export async function getChatsCollection(): Promise<Collection<Chat>> {
+export async function getChatsCollection(): Promise<Collection> {
   const db = await getDb();
-  return db.collection<Chat>("chats");
+  return db.collection("chats");
 }
 
-export async function getMessagesCollection(): Promise<Collection<Message>> {
+export async function getMessagesCollection(): Promise<Collection> {
   const db = await getDb();
-  return db.collection<Message>("messages");
-} // update this asweel
+  return db.collection("messages");
+}

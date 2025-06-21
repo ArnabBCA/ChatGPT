@@ -1,105 +1,107 @@
 "use client";
 
-import { use, useEffect, useRef, useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import { useChatboxStore } from "@/store/chatbox-store";
-import { useParams, useRouter } from "next/navigation";
-
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { cn } from "@/lib/utils";
+
+import { useEffect, useRef, useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { useChatboxStore } from "@/store/chatbox-store";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 
 export default function ChatId() {
+  const [allMessages, setAllMessages] = useState<any[]>([]);
+  const [oldMessages, setOldMessages] = useState<any[]>([]);
   const { chatId } = useParams();
   const router = useRouter();
-  if (!chatId) return;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const pendingMessage = useChatboxStore((state) => state.pendingMessage);
+
+  // Prevent running if chatId is undefined (especially during SSR)
+  if (!chatId || typeof chatId !== "string") return null;
 
   const { messages, append } = useChat({
     api: "/api/messages",
-    id: chatId.toString(),
+    id: chatId,
+    sendExtraMessageFields: true,
+    experimental_prepareRequestBody({ messages, id }) {
+      return { message: messages[messages.length - 1], id };
+    },
   });
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isOverflowing, setIsOverflowing] = useState(false);
-  const [oldMessages, setOldMessages] = useState<any[]>([]);
 
-  const pendingMessage = useChatboxStore((state) => state.pendingMessage);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const getOldMessages = async () => {
-    try {
-      const res = await axios.get(`/api/messages?chatId=${chatId}`);
-
-      const tempMessages: any[] = [];
-      res.data.forEach((msg: any) => {
-        tempMessages.push({
-          role: msg.role,
-          content: msg.content,
-        });
-      });
-
-      setOldMessages(tempMessages);
-      console.log("Fetched old messages:", res.data);
-    } catch (error) {
-      console.error("Failed to fetch old messages:", error);
-    }
-  };
-
-  const appendMessage = (message: string | null) => {
-    if (typeof message === "string" && message.trim() !== "") {
-      console.log("Appending message:", message);
-      append({
-        role: "user",
-        content: message,
-      });
-    }
-  };
-
-  const isValidChatId = async () => {
-    try {
-      const res = await axios.post("/api/chats", { chatId });
-      if (res.status !== 200) {
-        console.error("Invalid chatId:", chatId);
+  // Validate chatId on mount
+  useEffect(() => {
+    const isValidChatId = async () => {
+      try {
+        const res = await axios.post("/api/chats", { chatId });
+        if (res.status !== 200) {
+          console.error("Invalid chatId:", chatId);
+          router.push("/");
+        }
+      } catch (error: any) {
+        if (error.response?.status === 400) {
+          console.error("Invalid chatId:", chatId);
+        } else {
+          console.error("Failed to validate chatId:", error);
+        }
         router.push("/");
       }
-    } catch (error: any) {
-      if (error.response.status === 400) {
-        console.error("Invalid chatId:", chatId);
-      } else {
-        console.error("Failed to validate chatId:", error);
-      }
-      router.push("/");
-    }
-  };
+    };
 
-  useEffect(() => {
+    const getOldMessages = async () => {
+      try {
+        const res = await axios.get(`/api/messages?chatId=${chatId}`);
+        setOldMessages(res.data || []);
+        console.log("Fetched old messages:", res.data);
+      } catch (error) {
+        console.error("Failed to fetch old messages:", error);
+      }
+    };
+
     isValidChatId();
-    //getOldMessages();
-    appendMessage(pendingMessage);
+    getOldMessages();
+  }, [chatId]);
+
+  // Append pending message
+  useEffect(() => {
+    if (pendingMessage?.trim()) {
+      append({
+        role: "user",
+        content: pendingMessage,
+      });
+    }
   }, [pendingMessage]);
 
+  // Combine new and old messages into allMessages
+  useEffect(() => {
+    setAllMessages([...oldMessages, ...messages]);
+  }, [messages, oldMessages]);
+
+  // Auto scroll to bottom on new message
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [allMessages]);
 
+  // Detect overflow
   useEffect(() => {
     const checkOverflow = () => {
       if (containerRef.current) {
-        const el = containerRef.current;
-        console.log(el.scrollHeight > el.clientHeight);
-        setIsOverflowing(el.scrollHeight > el.clientHeight);
+        setIsOverflowing(
+          containerRef.current.scrollHeight > containerRef.current.clientHeight
+        );
       }
     };
 
     checkOverflow();
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
-  }, [messages]);
-
+  }, [allMessages]);
   return (
     <div
       ref={containerRef}
@@ -109,7 +111,7 @@ export default function ChatId() {
       )}
     >
       <div className="flex flex-col gap-10 h-full w-full max-w-[32rem] sm:max-w-[40rem] md:max-w-[48rem]">
-        {messages.map((msg, i) => (
+        {allMessages.map((msg, i) => (
           <div
             key={i}
             className={`whitespace-pre-wrap w-full prose prose-neutral dark:prose-invert ${
