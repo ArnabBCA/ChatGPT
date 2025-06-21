@@ -36,7 +36,7 @@ export default function Chatbox() {
     setSlideToBottom(true);
 
     try {
-      const res = await axios.post("/api/chat");
+      const res = await axios.patch("/api/chats");
       const { chatId } = res.data;
       router.push(`/c/${chatId}`);
     } catch (error) {

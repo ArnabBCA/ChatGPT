@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useChatboxStore } from "@/store/chatbox-store";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -11,10 +11,13 @@ import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { cn } from "@/lib/utils";
+import axios from "axios";
 
 export default function ChatId() {
   const { chatId } = useParams();
+  const router = useRouter();
   if (!chatId) return;
+
   const { messages, append } = useChat({
     api: "/api/messages",
     id: chatId.toString(),
@@ -23,7 +26,6 @@ export default function ChatId() {
   const [isOverflowing, setIsOverflowing] = useState(false);
 
   const pendingMessage = useChatboxStore((state) => state.pendingMessage);
-  const setPendingMessage = useChatboxStore((state) => state.setPendingMessage);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +39,25 @@ export default function ChatId() {
     }
   };
 
+  const isValidChatId = async () => {
+    try {
+      const res = await axios.post("/api/chats", { chatId });
+      if (res.status !== 200) {
+        console.error("Invalid chatId:", chatId);
+        router.push("/");
+      }
+    } catch (error: any) {
+      if (error.response.status === 400) {
+        console.error("Invalid chatId:", chatId);
+      } else {
+        console.error("Failed to validate chatId:", error);
+      }
+      router.push("/");
+    }
+  };
+
   useEffect(() => {
+    isValidChatId();
     appendMessage(pendingMessage);
   }, [pendingMessage]);
 
