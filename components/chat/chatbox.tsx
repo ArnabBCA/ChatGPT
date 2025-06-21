@@ -11,6 +11,7 @@ import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
 import { useChatboxStore } from "@/store/chatbox-store";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 export default function Chatbox() {
   const pathname = usePathname();
@@ -34,13 +35,13 @@ export default function Chatbox() {
     setInput("");
     setSlideToBottom(true);
 
-    let finalChatId = pathname.startsWith("/c/")
-      ? pathname.split("/c/")[1]
-      : null;
-
-    if (!finalChatId) {
-      finalChatId = uuidv4();
-      router.push(`/c/${finalChatId}`);
+    try {
+      const res = await axios.post("/api/chat");
+      const { chatId } = res.data;
+      router.push(`/c/${chatId}`);
+    } catch (error) {
+      console.error("Failed to create chat:", error);
+      return;
     }
   };
 

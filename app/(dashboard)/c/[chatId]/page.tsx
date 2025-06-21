@@ -16,7 +16,7 @@ export default function ChatId() {
   const { chatId } = useParams();
   if (!chatId) return;
   const { messages, append } = useChat({
-    api: "/api/chat",
+    api: "/api/messages",
     id: chatId.toString(),
   });
   const containerRef = useRef<HTMLDivElement>(null);
