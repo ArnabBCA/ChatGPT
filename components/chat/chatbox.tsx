@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
@@ -15,6 +15,7 @@ import axios from "axios";
 
 export default function Chatbox() {
   const pathname = usePathname();
+  const { chatId } = useParams();
   const router = useRouter();
 
   const {
@@ -35,13 +36,15 @@ export default function Chatbox() {
     setInput("");
     setSlideToBottom(true);
 
-    try {
-      const res = await axios.patch("/api/chats");
-      const { chatId } = res.data;
-      router.push(`/c/${chatId}`);
-    } catch (error) {
-      console.error("Failed to create chat:", error);
-      return;
+    if (!chatId) {
+      try {
+        const res = await axios.patch("/api/chats");
+        const { chatId } = res.data;
+        router.push(`/c/${chatId}`);
+      } catch (error) {
+        console.error("Failed to create chat:", error);
+        return;
+      }
     }
   };
 

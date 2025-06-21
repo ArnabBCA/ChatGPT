@@ -24,10 +24,30 @@ export default function ChatId() {
   });
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
+  const [oldMessages, setOldMessages] = useState<any[]>([]);
 
   const pendingMessage = useChatboxStore((state) => state.pendingMessage);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const getOldMessages = async () => {
+    try {
+      const res = await axios.get(`/api/messages?chatId=${chatId}`);
+
+      const tempMessages: any[] = [];
+      res.data.forEach((msg: any) => {
+        tempMessages.push({
+          role: msg.role,
+          content: msg.content,
+        });
+      });
+
+      setOldMessages(tempMessages);
+      console.log("Fetched old messages:", res.data);
+    } catch (error) {
+      console.error("Failed to fetch old messages:", error);
+    }
+  };
 
   const appendMessage = (message: string | null) => {
     if (typeof message === "string" && message.trim() !== "") {
@@ -58,6 +78,7 @@ export default function ChatId() {
 
   useEffect(() => {
     isValidChatId();
+    //getOldMessages();
     appendMessage(pendingMessage);
   }, [pendingMessage]);
 

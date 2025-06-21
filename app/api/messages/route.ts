@@ -3,6 +3,23 @@ import { streamText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getMessagesCollection } from "@/lib/collection";
 
+export async function GET(req: Request) {
+  const { userId } = await auth();
+  if (!userId) return new Response("Unauthorized", { status: 401 });
+
+  const url = new URL(req.url);
+  const chatId = url.searchParams.get("chatId");
+
+  if (!chatId) {
+    return new Response("Missing chatId", { status: 400 });
+  }
+
+  const messagesCollection = await getMessagesCollection();
+  const messages = await messagesCollection.find({ chatId }).toArray();
+
+  return Response.json(messages, { status: 200 });
+}
+
 export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
