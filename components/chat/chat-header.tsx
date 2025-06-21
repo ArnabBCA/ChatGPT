@@ -4,6 +4,7 @@ import EditChatIcon from "../icons/edit-chat-icon";
 import { ThemeToggle } from "../theme-toggle";
 import { Button } from "../ui/button";
 import { SidebarTrigger, useSidebar } from "../ui/sidebar";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 export default function ChatHeader() {
   const { open } = useSidebar();
@@ -28,7 +29,12 @@ export default function ChatHeader() {
           <ChevronDown className="text-muted-foreground" />
         </Button>
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div>
     </div>
   );
 }
