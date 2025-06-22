@@ -26,18 +26,19 @@ export default function RenderMessage({ msg }: { msg: any }) {
             "flex flex-col group"
           )}
         >
+          {renderAttachments(msg)}
           <div
             className={cn(
               "whitespace-pre-wrap prose prose-neutral dark:prose-invert",
+              msg.experimental_attachments?.length > 0
+                ? "rounded-t-3xl rounded-b-3xl rounded-l-3xl rounded-r-sm"
+                : "rounded-3xl",
               msg.role == "user"
-                ? "self-end dark:bg-[#323232d9] dark:text-white rounded-3xl px-5 py-2.5"
+                ? "self-end dark:bg-[#323232d9] dark:text-white px-5 py-2.5"
                 : ""
             )}
           >
-            <div className="markdown">
-              {renderMarkdown(msg.content || "")}
-              {renderAttachments(msg.experimental_attachments)}
-            </div>
+            <div className="markdown">{renderMarkdown(msg.content || "")}</div>
             {msg.role !== "user" && <AiMessageActionButtons />}
           </div>
           {msg.role === "user" && (
