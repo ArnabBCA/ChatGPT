@@ -28,8 +28,7 @@ export default function CustomSidebarMenuItem({ chat, icon, text }: Props) {
             className="py-2 px-2.5 min-h-9 text-sm overflow-ellipsis flex items-center gap-2"
           >
             <div className="flex items-center w-full justify-between">
-              <span className="flex items-center gap-2">
-                {icon}
+              <span className="truncate text-ellipsis whitespace-nowrap">
                 {chat.title || "New Chat"}
               </span>
               <DropdownMenu>
