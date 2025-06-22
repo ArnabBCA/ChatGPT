@@ -49,38 +49,45 @@ export async function PATCH(req: Request) {
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
   const chatsCollection = await getChatsCollection();
-  const newChatId = crypto.randomUUID();
 
-  let chatTitle = "New Chat";
+  let title: string | undefined;
+  let chatId: string | undefined;
 
+  // Gracefully parse JSON if it exists and is valid
   try {
-    const body = await req.json();
-    chatTitle = body.chatTitle || "New Chat";
-  } catch (err) {
-    console.warn("Using default chatTitle");
+    const text = await req.text();
+    if (text) {
+      const body = JSON.parse(text);
+      title = body.title;
+      chatId = body.chatId;
+    }
+  } catch {
+    // Do nothing — just assume it's a new chat without data
   }
+
+  const isNewChat = !chatId;
+  const newChatId = isNewChat ? crypto.randomUUID() : chatId;
 
   try {
     await chatsCollection.findOneAndUpdate(
-      {
-        chatId: newChatId,
-        userId,
-      },
+      { chatId: newChatId, userId },
       {
         $set: {
           updatedAt: new Date(),
-          title: chatTitle || "New Chat",
+          title: title || "New Chat",
         },
-        $setOnInsert: {
-          createdAt: new Date(),
-        },
+        ...(isNewChat && {
+          $setOnInsert: { createdAt: new Date() },
+        }),
       },
-      { upsert: true }
+      { upsert: isNewChat }
     );
 
-    return Response.json({ chatId: newChatId });
+    return isNewChat
+      ? Response.json({ chatId: newChatId })
+      : Response.json("Updated Chat Title", { status: 200 });
   } catch (err) {
-    console.error("Failed to Create Update Chat:", err);
+    console.error("Failed to create/update chat:", err);
     return new Response("Failed to update chat", { status: 500 });
   }
 }

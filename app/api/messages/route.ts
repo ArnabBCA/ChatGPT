@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { appendClientMessage, appendResponseMessages, streamText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { getMessagesCollection } from "@/lib/collection";
+import { getChatsCollection, getMessagesCollection } from "@/lib/collection";
 
 export async function GET(req: Request) {
   const { userId } = await auth();
@@ -26,13 +26,40 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
-  const { message, id } = await req.json();
+  const messagesCollection = await getMessagesCollection();
+  const chatsCollection = await getChatsCollection();
 
   const google = createGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY!,
   });
 
-  const messagesCollection = await getMessagesCollection();
+  const { message, id } = await req.json();
+
+  function formatTitle(str: string) {
+    if (!str) return;
+    const sliced = str.slice(0, 50);
+    return sliced.charAt(0).toUpperCase() + sliced.slice(1);
+  }
+
+  //update chat title if it exists
+  if (message && id) {
+    try {
+      const chat = await chatsCollection.findOne({ chatId: id, userId });
+      if (chat && chat.title && chat.title === "New Chat") {
+        await chatsCollection.updateOne(
+          { chatId: id, userId },
+          {
+            $set: {
+              updatedAt: new Date(),
+              title: formatTitle(message.content),
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update chat title:", error);
+    }
+  }
 
   const getAllOldMessages = async () => {
     try {

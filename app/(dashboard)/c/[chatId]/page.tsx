@@ -111,28 +111,22 @@ export default function ChatId() {
     setAllMessages(unique);
   }, [messages, oldMessages]);
 
-  useEffect(() => {
-    /*if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }*/
-
-    const checkOverflow = () => {
-      if (containerRef.current) {
-        setIsOverflowing(
-          containerRef.current.scrollHeight > containerRef.current.clientHeight
-        );
-      }
-    };
-
-    checkOverflow();
-    window.addEventListener("resize", checkOverflow);
-    return () => window.removeEventListener("resize", checkOverflow);
-  }, [allMessages]);
+  const checkOverflow = () => {
+    if (containerRef.current) {
+      setIsOverflowing(
+        containerRef.current.scrollHeight > containerRef.current.clientHeight
+      );
+      console.log(
+        containerRef.current.scrollHeight > containerRef.current.clientHeight
+      );
+    }
+  };
 
   useEffect(() => {
-    if (!loading && scrollRef.current) {
+    if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "instant" });
     }
+    checkOverflow();
   }, [loading]);
 
   useEffect(() => {
@@ -143,8 +137,8 @@ export default function ChatId() {
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0",
-        isOverflowing ? "pr-2 pl-6" : "px-6"
+        "flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0 pr-2 pl-6"
+        //"px-6"
       )}
     >
       {loading ? (
