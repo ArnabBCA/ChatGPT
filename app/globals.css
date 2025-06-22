@@ -98,6 +98,15 @@
   }
 }
 
+@keyframes scaleUpDown {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: #fff /*oklch(1 0 0)*/;
