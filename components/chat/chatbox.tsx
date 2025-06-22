@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "../ui/button";
@@ -11,27 +11,32 @@ import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
 import { useChatboxStore } from "@/store/chatbox-store";
 import axios from "axios";
+import { FileUploaderRegular } from "@uploadcare/react-uploader/next";
+import "@uploadcare/react-uploader/core.css";
 
 export default function Chatbox() {
   const [input, setInput] = useState("");
+  const [uploadcarefiles, setUploadcareFiles] = useState<any[]>([]);
   const pathname = usePathname();
   const { chatId } = useParams();
   const router = useRouter();
 
   const {
     setUserInput,
+    setUserFiles,
     slideToBottom,
     fixedToBottom,
     setSlideToBottom,
     setFixedToBottom,
   } = useChatboxStore();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
     const trimmed = input.trim();
     if (!trimmed) return;
 
     setUserInput(trimmed);
-    setInput("");
     setSlideToBottom(true);
 
     if (!chatId) {
@@ -44,9 +49,12 @@ export default function Chatbox() {
         return;
       }
     }
+    setUserFiles(uploadcarefiles);
+
+    setUploadcareFiles([]);
+    setInput("");
   };
 
-  // Set correct bottom state on mount depending on path
   useEffect(() => {
     if (pathname === "/") {
       setSlideToBottom(false);
@@ -56,6 +64,10 @@ export default function Chatbox() {
       setFixedToBottom(true);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    console.log("Uploadcare files changed:", uploadcarefiles);
+  }, [uploadcarefiles]);
 
   return (
     <motion.div
@@ -78,7 +90,7 @@ export default function Chatbox() {
         }
       }}
     >
-      <div className="w-full rounded-[28px] overflow-hidden p-2.5 dark:bg-[#303030] shadow-short">
+      <form className="w-full rounded-[28px] overflow-hidden p-2.5 dark:bg-[#303030] shadow-short">
         <Textarea
           className="w-full border-none focus-visible:border-none focus-visible:ring-0 shadow-none !bg-transparent pb-0 pt-[7px] px-3 pl-[11px] min-h-12 !text-[16px] font-normal hide-resizer placeholder:font-normal"
           placeholder="Ask anything"
@@ -93,13 +105,30 @@ export default function Chatbox() {
         />
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-[1px]">
-            <Button
+            {/*<Button
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal"
               variant={"ghost"}
               size={"icon"}
+              onClick={handleFileSelect}
             >
               <PlusIcon size={20} />
-            </Button>
+            </Button>*/}
+            <FileUploaderRegular
+              useCloudImageEditor={false}
+              sourceList="local, gdrive"
+              pubkey={process.env.NEXT_PUBLIC_UPLOADCARE_PUB_KEY!}
+              onFileUploadSuccess={(file) => {}}
+              onChange={(files) => {
+                setUploadcareFiles(
+                  files.successEntries.map((file: any) => ({
+                    name: file.name,
+                    size: file.size,
+                    url: file.cdnUrl,
+                    contentType: file.mimeType,
+                  }))
+                );
+              }}
+            />
             <Button
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal flex items-center gap-1.5 !px-2"
               variant={"ghost"}
@@ -120,13 +149,13 @@ export default function Chatbox() {
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-200 dark:hover:!bg-neutral-500/80 rounded-full font-normal bg-[#00000014] dark:bg-[#ffffff29]"
               variant={"ghost"}
               size={"icon"}
-              onClick={handleSubmit}
+              type="submit"
             >
               <VoiceIcon size={20} />
             </Button>
           </div>
         </div>
-      </div>
+      </form>
     </motion.div>
   );
 }

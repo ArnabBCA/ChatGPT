@@ -7,27 +7,27 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { cn } from "@/lib/utils";
 
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useChatboxStore } from "@/store/chatbox-store";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import AiMessageActionButtons from "@/components/chat/ai-meesage-action-buttons";
-import { set } from "zod";
 
 export default function ChatId() {
   const { chatId } = useParams();
   const router = useRouter();
-  const { setUserInput, setIsFinished } = useChatboxStore();
+  const { setUserInput, setUserFiles, setIsFinished } = useChatboxStore();
 
   const [allMessages, setAllMessages] = useState<any[]>([]);
   const [oldMessages, setOldMessages] = useState<any[]>([]);
-  const [isOverflowing, setIsOverflowing] = useState(false);
+  //const [isOverflowing, setIsOverflowing] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [isFinishedState, setIsFinishedState] = useState(false);
 
   const userInput = useChatboxStore((state) => state.userInput);
+  const userFiles = useChatboxStore((state) => state.userFiles);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -83,22 +83,21 @@ export default function ChatId() {
   }, [chatId]);
 
   useEffect(() => {
-    if (userInput?.trim()) {
-      append({
-        role: "user",
-        content: userInput,
-      });
-      if (scrollRef.current) {
-        scrollRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-      setUserInput(""); // Clear input after appending
+    if (userInput?.trim() || userFiles?.length) {
+      (async () => {
+        append({
+          role: "user",
+          content: userInput ?? "",
+          experimental_attachments: userFiles,
+        });
+        setUserInput(""); // Clear input after appending
+        setUserFiles([]);
+      })();
     }
-  }, [userInput]);
-
-  /*useEffect(() => {
-    console.log("Messages updated:", messages);
-    setAllMessages([...oldMessages, ...messages]);
-  }, [oldMessages, messages]);*/
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [userInput, userFiles]);
 
   useEffect(() => {
     const merged = [...oldMessages, ...messages];
@@ -111,22 +110,15 @@ export default function ChatId() {
     setAllMessages(unique);
   }, [messages, oldMessages]);
 
-  const checkOverflow = () => {
-    if (containerRef.current) {
-      setIsOverflowing(
-        containerRef.current.scrollHeight > containerRef.current.clientHeight
-      );
-      console.log(
-        containerRef.current.scrollHeight > containerRef.current.clientHeight
-      );
-    }
-  };
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "instant" });
     }
-    checkOverflow();
+    /*if (containerRef.current) {
+      setIsOverflowing(
+        containerRef.current.scrollHeight > containerRef.current.clientHeight
+      );
+    }*/
   }, [loading]);
 
   useEffect(() => {
@@ -192,8 +184,25 @@ export default function ChatId() {
                     ),
                   }}
                 >
-                  {msg.content}
+                  {typeof msg.content === "string" ? msg.content : ""}
                 </ReactMarkdown>
+                {msg.experimental_attachments &&
+                  msg.experimental_attachments.length > 0 && (
+                    <div>
+                      {msg.experimental_attachments.map((file: any) => (
+                        <div key={file.url} className="mb-1">
+                          <a
+                            href={file.url || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline"
+                          >
+                            {file.name || `Attachment ${file.url + 1}`}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
               {msg.role !== "user" && <AiMessageActionButtons />}
             </div>

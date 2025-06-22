@@ -7,9 +7,12 @@ interface ChatboxState {
   userInput: string | null;
   setUserInput: (value: string | null) => void;
 
+  userFiles: any[];
+  setUserFiles: (files: any[]) => void;
+
   chats: any[];
   setChats: (chats: any[]) => void;
-  
+
   isFinished: boolean;
   setIsFinished: (value: boolean) => void;
 
@@ -27,6 +30,9 @@ export const useChatboxStore = create<ChatboxState>()(
     (set) => ({
       userInput: null,
       setUserInput: (value) => set({ userInput: value }),
+
+      userFiles: [],
+      setUserFiles: (files) => set({ userFiles: files }),
 
       chats: [],
       setChats: (chats) => set({ chats }),
