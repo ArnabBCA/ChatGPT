@@ -37,7 +37,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroupContent>
-          <SidebarMenu>
+          <SidebarMenu className="gap-0">
             <CustomSidebarMenuItem text="Chats" />
             {chats.map((chat) => (
               <CustomSidebarMenuItem chat={chat} key={chat.chatId} />

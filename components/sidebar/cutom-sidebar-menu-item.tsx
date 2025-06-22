@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Archive, Ellipsis, Pencil, Trash2, Upload } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface Props {
   chat?: any;
@@ -19,13 +21,18 @@ interface Props {
 }
 
 export default function CustomSidebarMenuItem({ chat, icon, text }: Props) {
+  const pathname = usePathname();
+  const isActive = chat ? pathname === `/c/${chat.chatId}` : false;
   return (
     <SidebarMenuItem key={chat?.chatId} className="mx-1.5 hover-with-ellipsis">
       {chat && (
         <Link href={`/c/${chat.chatId}`}>
           <SidebarMenuButton
             asChild
-            className="py-2 px-2.5 min-h-9 text-sm overflow-ellipsis flex items-center gap-2"
+            className={cn(
+              isActive ? "bg-white/5" : "dark:hover:bg-white/10",
+              "py-2 px-2.5 min-h-9 text-sm overflow-ellipsis flex items-center gap-2"
+            )}
           >
             <div className="flex items-center w-full justify-between">
               <span className="truncate text-ellipsis whitespace-nowrap">
