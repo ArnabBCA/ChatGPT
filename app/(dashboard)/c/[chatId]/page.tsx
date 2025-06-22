@@ -44,11 +44,12 @@ export default function ChatId() {
     try {
       setLoading(true);
       const res = await axios.get(`/api/messages?chatId=${chatId}`);
+      if (res.data.length === 0) return;
       setMessages(res.data);
     } catch (error) {
       console.error("Fetching messages failed:", error);
     } finally {
-      setTimeout(() => setLoading(false), 100);
+      setLoading(false);
     }
   };
 

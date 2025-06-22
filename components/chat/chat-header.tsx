@@ -16,7 +16,7 @@ export default function ChatHeader() {
   const isFinished = useChatboxStore((state) => state.isFinished);
 
   const getAllChats = async () => {
-    console.log("Fetching all chats...");
+
     try {
       const res = await axios.get("/api/chats");
       setChats(res.data);
