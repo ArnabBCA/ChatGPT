@@ -113,22 +113,25 @@ export default function Chatbox() {
             >
               <PlusIcon size={20} />
             </Button>*/}
-            <FileUploaderRegular
-              useCloudImageEditor={false}
-              sourceList="local, gdrive"
-              pubkey={process.env.NEXT_PUBLIC_UPLOADCARE_PUB_KEY!}
-              onFileUploadSuccess={(file) => {}}
-              onChange={(files) => {
-                setUploadcareFiles(
-                  files.successEntries.map((file: any) => ({
-                    name: file.name,
-                    size: file.size,
-                    url: file.cdnUrl,
-                    contentType: file.mimeType,
-                  }))
-                );
-              }}
-            />
+            <div className="relative  min-w-[120.68px] min-h-[32.4px]">
+              <FileUploaderRegular
+                className="absolute"
+                useCloudImageEditor={false}
+                sourceList="local, gdrive"
+                pubkey={process.env.NEXT_PUBLIC_UPLOADCARE_PUB_KEY!}
+                onFileUploadSuccess={(file) => {}}
+                onChange={(files) => {
+                  setUploadcareFiles(
+                    files.successEntries.map((file: any) => ({
+                      name: file.name,
+                      size: file.size,
+                      url: file.cdnUrl,
+                      contentType: file.mimeType,
+                    }))
+                  );
+                }}
+              />
+            </div>
             <Button
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal flex items-center gap-1.5 !px-2"
               variant={"ghost"}
