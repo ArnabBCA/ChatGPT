@@ -12,23 +12,23 @@ import RenderMessage from "@/components/chat/render-message";
 export default function ChatId() {
   const { chatId } = useParams();
   const router = useRouter();
-  const { setUserInput, setUserFiles, setIsFinished } = useChatboxStore();
+  const { setUserInput, setUserFiles, setIsFinished, setEditedMessage } =
+    useChatboxStore();
 
-  const [allMessages, setAllMessages] = useState<any[]>([]);
-  const [oldMessages, setOldMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isFinishedState, setIsFinishedState] = useState(false);
 
   const userInput = useChatboxStore((state) => state.userInput);
   const userFiles = useChatboxStore((state) => state.userFiles);
+  const editedMessage = useChatboxStore((state) => state.editedMessage);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   if (!chatId || typeof chatId !== "string") return null;
 
-  const { messages, append } = useChat({
+  const { messages, append, setMessages } = useChat({
     api: "/api/messages",
     id: chatId,
     sendExtraMessageFields: true,
@@ -40,31 +40,29 @@ export default function ChatId() {
     onResponse: () => setIsThinking(false),
   });
 
+  const fetchOldMessages = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/messages?chatId=${chatId}`);
+      setMessages(res.data);
+    } catch (error) {
+      console.error("Fetching messages failed:", error);
+    } finally {
+      setTimeout(() => setLoading(false), 100);
+    }
+  };
+
   useEffect(() => {
     const validateChat = async () => {
       try {
-        const res = await axios.post("/api/chats", { chatId });
-        if (res.status !== 200) router.push("/");
+        await axios.post("/api/chats", { chatId });
+        fetchOldMessages();
       } catch (error: any) {
         console.error("Chat ID validation error:", error);
         router.push("/");
       }
     };
-
-    const fetchOldMessages = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`/api/messages?chatId=${chatId}`);
-        setOldMessages(res.data || []);
-      } catch (error) {
-        console.error("Fetching messages failed:", error);
-      } finally {
-        setTimeout(() => setLoading(false), 100);
-      }
-    };
-
     validateChat();
-    fetchOldMessages();
   }, [chatId]);
 
   useEffect(() => {
@@ -82,12 +80,6 @@ export default function ChatId() {
   }, [userInput, userFiles]);
 
   useEffect(() => {
-    const merged = [...oldMessages, ...messages];
-    const unique = Array.from(new Map(merged.map((m) => [m.id, m])).values());
-    setAllMessages(unique);
-  }, [messages, oldMessages]);
-
-  useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "instant" });
   }, [loading]);
 
@@ -95,13 +87,39 @@ export default function ChatId() {
     setIsFinished(isFinishedState);
   }, [isFinishedState]);
 
+  const handleEdit = async () => {
+    if (!editedMessage.id) return;
+    const updatedMessages = await updateMessages(
+      editedMessage.id,
+      chatId as string
+    );
+    setMessages(updatedMessages);
+    setUserInput(editedMessage.content);
+    setEditedMessage({ id: "", content: "" });
+  };
+
+  useEffect(() => {
+    handleEdit();
+  }, [editedMessage]);
+
+  const updateMessages = async (messageId: string, chatId: string) => {
+    try {
+      const res = await axios.delete("/api/messages", {
+        data: { messageId: messageId, chatId: chatId },
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Failed to update messages:", error);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
       className="flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0 pr-2 pl-6 my-scrollbar"
     >
       <div className="flex flex-col gap-10 h-full w-full max-w-[48rem] mt-1.5">
-        {allMessages.map((msg) => (
+        {messages.map((msg) => (
           <RenderMessage key={msg.id} msg={msg} />
         ))}
         {isThinking && (
@@ -113,7 +131,7 @@ export default function ChatId() {
           ref={scrollRef}
           className={cn(
             "w-full",
-            allMessages.length > 2 ? "pb-[calc(100vh-300px)]" : "pb-25"
+            messages.length > 2 ? "pb-[calc(100vh-300px)]" : "pb-25"
           )}
         />
       </div>

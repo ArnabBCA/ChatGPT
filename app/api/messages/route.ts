@@ -22,6 +22,44 @@ export async function GET(req: Request) {
   }
 }
 
+export async function DELETE(req: Request) {
+  const { userId } = await auth();
+  if (!userId) return new Response("Unauthorized", { status: 401 });
+
+  const { messageId, chatId } = await req.json();
+  const messagesCollection = await getMessagesCollection();
+
+  try {
+    // Get the chat by unique chatId (userId not needed in query anymore)
+    const chat = await messagesCollection.findOne({ chatId });
+
+    if (!chat) return new Response("Chat not found", { status: 404 });
+
+    // Find the index of the message to delete from
+    const index = chat.messages.findIndex((m: any) => m.id === messageId);
+    if (index === -1) return new Response("Message not found", { status: 404 });
+
+    // Keep only messages AFTER the deleted one
+    const updatedMessages = chat.messages.slice(0, index);
+
+    // Update messages in DB
+    const result = await messagesCollection.updateOne(
+      { chatId },
+      { $set: { messages: updatedMessages } }
+    );
+
+    if (result.modifiedCount === 0) {
+      console.error("Update failed — no documents matched");
+      return new Response("Update failed", { status: 500 });
+    }
+
+    return Response.json(updatedMessages, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete messages:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });

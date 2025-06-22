@@ -13,6 +13,12 @@ interface ChatboxState {
   chats: any[];
   setChats: (chats: any[]) => void;
 
+  editedMessage: {
+    id: string;
+    content: string;
+  };
+  setEditedMessage: (message: { id: string; content: string }) => void;
+
   isFinished: boolean;
   setIsFinished: (value: boolean) => void;
 
@@ -36,6 +42,9 @@ export const useChatboxStore = create<ChatboxState>()(
 
       chats: [],
       setChats: (chats) => set({ chats }),
+
+      editedMessage: { id: "", content: "" },
+      setEditedMessage: (message) => set({ editedMessage: message }),
 
       isFinished: false,
       setIsFinished: (value) => set({ isFinished: value }),

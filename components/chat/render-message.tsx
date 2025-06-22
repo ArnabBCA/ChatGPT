@@ -6,11 +6,19 @@ import UserMessageActionButtons from "./user-message-action-buttons";
 import { useEffect, useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { useChatboxStore } from "@/store/chatbox-store";
 
 export default function RenderMessage({ msg }: { msg: any }) {
   const [isEditing, setIsEditing] = useState(false);
 
   const [textContent, setTextContent] = useState(msg.content || "");
+
+  const { setEditedMessage } = useChatboxStore();
+
+  const handleEditMessage = () => {
+    setEditedMessage({ id: msg.id, content: textContent });
+    setIsEditing(false);
+  };
 
   useEffect(() => {
     setTextContent(msg.content || "");
@@ -63,7 +71,10 @@ export default function RenderMessage({ msg }: { msg: any }) {
             >
               Cancel
             </Button>
-            <Button className="border-1 max-h-9 rounded-full py-0 px-3">
+            <Button
+              className="border-1 max-h-9 rounded-full py-0 px-3"
+              onClick={handleEditMessage}
+            >
               Send
             </Button>
           </div>
