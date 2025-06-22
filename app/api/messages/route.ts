@@ -42,23 +42,18 @@ export async function POST(req: Request) {
   }
 
   //update chat title if it exists
-  if (message && id) {
-    try {
-      const chat = await chatsCollection.findOne({ chatId: id, userId });
-      if (chat && chat.title && chat.title === "New Chat") {
-        await chatsCollection.updateOne(
-          { chatId: id, userId },
-          {
-            $set: {
-              updatedAt: new Date(),
-              title: formatTitle(message.content),
-            },
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Failed to update chat title:", error);
+  try {
+    const chat = await chatsCollection.findOne({ chatId: id, userId });
+
+    const update: any = { updatedAt: new Date() };
+
+    if (chat?.title === "New Chat") {
+      update.title = formatTitle(message.content);
     }
+
+    await chatsCollection.updateOne({ chatId: id, userId }, { $set: update });
+  } catch (error) {
+    console.error("Failed to update chat title:", error);
   }
 
   const getAllOldMessages = async () => {

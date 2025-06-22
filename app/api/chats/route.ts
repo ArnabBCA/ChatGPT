@@ -8,7 +8,10 @@ export async function GET() {
   const chatsCollection = await getChatsCollection();
 
   try {
-    const chats = await chatsCollection.find({ userId }).toArray();
+    const chats = await chatsCollection
+      .find({ userId })
+      .sort({ updatedAt: -1 })
+      .toArray();
 
     return Response.json(chats || [], { status: 200 });
   } catch (err) {
