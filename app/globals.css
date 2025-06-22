@@ -99,12 +99,21 @@
 }
 
 @keyframes scaleUpDown {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
     transform: scale(1.25);
   }
+}
+
+.my-scrollbar:is(.dark *) {
+  scrollbar-color: #424242 transparent; /* thumb color, track color */
+}
+
+.my-scrollbar {
+  scrollbar-color: #ececec transparent; /* thumb color, track color */
 }
 
 :root {

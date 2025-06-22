@@ -35,7 +35,7 @@ export function AppSidebar() {
         </Link>
         <SidebarTrigger />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="my-scrollbar">
         <SidebarGroupContent>
           <SidebarMenu className="gap-0">
             <CustomSidebarMenuItem text="Chats" />

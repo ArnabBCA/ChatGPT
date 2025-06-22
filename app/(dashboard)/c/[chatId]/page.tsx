@@ -134,7 +134,7 @@ export default function ChatId() {
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0 pr-2 pl-6"
+        "flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0 pr-2 pl-6 my-scrollbar"
         //"px-6"
       )}
     >
