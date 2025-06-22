@@ -4,14 +4,25 @@ import { cn } from "@/lib/utils";
 
 export default function UserMessageActionButtons({
   role,
+  setIsEditing,
 }: {
   role: "user" | "assistant";
+  setIsEditing: (isEditing: boolean) => void;
 }) {
-  const icons = [
-    <Copy size={18} />,
-    <Pencil size={18} />,
-    <Pencil size={18} />,
+  const actions = [
+    {
+      icon: <Copy size={18} />,
+      onClick: () => {
+        // TODO: implement copy logic
+        console.log("Copy clicked");
+      },
+    },
+    {
+      icon: <Pencil size={18} />,
+      onClick: () => setIsEditing(true),
+    },
   ];
+
   return (
     <div
       className={cn(
@@ -19,14 +30,13 @@ export default function UserMessageActionButtons({
         "flex items-center px-1 py-1.5 opacity-0 group-hover:opacity-100"
       )}
     >
-      {icons.map((icon, index) => (
+      {actions.map(({ icon, onClick }, index) => (
         <Button
           key={index}
-          variant={"ghost"}
-          size={index === 5 ? undefined : "icon"}
-          className={`[&_svg]:!w-auto [&_svg]:!h-auto dark:hover:bg-neutral-500/20 ${
-            index === 5 ? "h-8 w-13" : "size-8"
-          }`}
+          variant="ghost"
+          size="icon"
+          className="[&_svg]:!w-auto [&_svg]:!h-auto dark:hover:bg-neutral-500/20 size-8"
+          onClick={onClick}
         >
           {icon}
         </Button>
