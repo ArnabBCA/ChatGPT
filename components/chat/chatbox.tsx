@@ -30,8 +30,8 @@ export default function Chatbox() {
     setFixedToBottom,
   } = useChatboxStore();
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     const trimmed = input.trim();
     if (!trimmed) return;
@@ -98,8 +98,7 @@ export default function Chatbox() {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleSubmit();
+              handleSubmit(e);
             }
           }}
         />
@@ -135,6 +134,7 @@ export default function Chatbox() {
             <Button
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal flex items-center gap-1.5 !px-2"
               variant={"ghost"}
+              type="button"
             >
               <SlidersIcon size={20} />
               <span className="pb-[1px]">Tools</span>
@@ -145,6 +145,7 @@ export default function Chatbox() {
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal size-8"
               variant={"ghost"}
               size={"icon"}
+              type="button"
             >
               <MicIcon size={20} />
             </Button>
@@ -152,7 +153,7 @@ export default function Chatbox() {
               className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-200 dark:hover:!bg-neutral-500/80 rounded-full font-normal bg-[#00000014] dark:bg-[#ffffff29]"
               variant={"ghost"}
               size={"icon"}
-              type="submit"
+              onClick={(e) => handleSubmit(e)}
             >
               <VoiceIcon size={20} />
             </Button>
