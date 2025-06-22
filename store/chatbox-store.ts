@@ -9,6 +9,9 @@ interface ChatboxState {
 
   chats: any[];
   setChats: (chats: any[]) => void;
+  
+  isFinished: boolean;
+  setIsFinished: (value: boolean) => void;
 
   slideToBottom: boolean;
   fixedToBottom: boolean;
@@ -27,6 +30,9 @@ export const useChatboxStore = create<ChatboxState>()(
 
       chats: [],
       setChats: (chats) => set({ chats }),
+
+      isFinished: false,
+      setIsFinished: (value) => set({ isFinished: value }),
 
       slideToBottom: false,
       fixedToBottom: false,

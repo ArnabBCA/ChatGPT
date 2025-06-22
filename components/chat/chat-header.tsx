@@ -5,9 +5,35 @@ import { ThemeToggle } from "../theme-toggle";
 import { Button } from "../ui/button";
 import { SidebarTrigger, useSidebar } from "../ui/sidebar";
 import { SignedIn, UserButton } from "@clerk/nextjs";
+import { useChatboxStore } from "@/store/chatbox-store";
+import axios from "axios";
+import { use, useEffect } from "react";
 
 export default function ChatHeader() {
   const { open } = useSidebar();
+
+  const { setChats, setIsFinished } = useChatboxStore();
+  const isFinished = useChatboxStore((state) => state.isFinished);
+
+  const getAllChats = async () => {
+    console.log("Fetching all chats...");
+    try {
+      const res = await axios.get("/api/chats");
+      setChats(res.data);
+    } catch (error) {
+      console.error("Failed to fetch chats:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isFinished) return;
+    getAllChats();
+  }, [isFinished]);
+
+  useEffect(() => {
+    getAllChats();
+  }, []);
+
   return (
     <div className="header-height w-full p-2 flex items-center justify-between">
       <div className="flex items-center">

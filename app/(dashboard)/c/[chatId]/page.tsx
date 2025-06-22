@@ -7,7 +7,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { cn } from "@/lib/utils";
 
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { useChatboxStore } from "@/store/chatbox-store";
 import { useParams, useRouter } from "next/navigation";
@@ -18,13 +18,14 @@ import { set } from "zod";
 export default function ChatId() {
   const { chatId } = useParams();
   const router = useRouter();
-  const { setUserInput } = useChatboxStore();
+  const { setUserInput, setIsFinished } = useChatboxStore();
 
   const [allMessages, setAllMessages] = useState<any[]>([]);
   const [oldMessages, setOldMessages] = useState<any[]>([]);
   const [isOverflowing, setIsOverflowing] = useState(false);
-  const [initialScrollDone, setInitialScrollDone] = useState(false);
+
   const [loading, setLoading] = useState(false);
+  const [isFinishedState, setIsFinishedState] = useState(false);
 
   const userInput = useChatboxStore((state) => state.userInput);
 
@@ -39,6 +40,9 @@ export default function ChatId() {
     sendExtraMessageFields: true,
     experimental_prepareRequestBody({ messages, id }) {
       return { message: messages[messages.length - 1], id };
+    },
+    onFinish: () => {
+      setIsFinishedState(true);
     },
   });
 
@@ -127,10 +131,13 @@ export default function ChatId() {
 
   useEffect(() => {
     if (!loading && scrollRef.current) {
-      console.log("Loading finished, scrolling to bottom");
       scrollRef.current.scrollIntoView({ behavior: "instant" });
     }
   }, [loading]);
+
+  useEffect(() => {
+    setIsFinished(isFinishedState);
+  }, [isFinishedState]);
 
   return (
     <div
