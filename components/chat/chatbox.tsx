@@ -15,6 +15,7 @@ import { FileUploaderRegular } from "@uploadcare/react-uploader/next";
 import "@uploadcare/react-uploader/core.css";
 import { cn } from "@/lib/utils";
 import { ArrowUp } from "lucide-react";
+import { useSidebar } from "../ui/sidebar";
 
 export default function Chatbox({ className = "" }: { className?: string }) {
   const [input, setInput] = useState("");
@@ -25,6 +26,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
   const pathname = usePathname();
   const { chatId } = useParams();
   const router = useRouter();
+  const { isMobile } = useSidebar();
 
   const { setUserInput, setUserFiles, slideToBottom, setSlideToBottom } =
     useChatboxStore();
@@ -80,7 +82,9 @@ export default function Chatbox({ className = "" }: { className?: string }) {
   return (
     <div className={cn(className, "w-full mx-auto")}>
       <motion.div
-        animate={pathname === "/" && slideToBottom && { y: yValue }}
+        animate={
+          pathname === "/" && !isMobile && slideToBottom && { y: yValue }
+        }
         transition={{ type: "tween", duration: 0.25 }}
         className={"mx-auto flex w-full flex-col max-w-[48rem] items-center"}
         ref={chatboxRef}
