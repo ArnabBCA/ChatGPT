@@ -10,18 +10,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen w-full flex-col">
       <ChatHeader />
-      <div className="h-full w-full flex justify-center relative">
+      <div className="h-full w-full flex justify-center flex-col">
         {children}
-        <Chatbox />
-        {pathname !== "/" && (
-          <div className="text-xs absolute bottom-0 w-full text-center min-h-8 p-2 md:px-[60px]">
-            ChatGPT can make mistakes. Check important info. See{" "}
-            <a href="#" className="underline">
-              Cookie Preferences
-            </a>
-            .
-          </div>
-        )}
       </div>
     </div>
   );

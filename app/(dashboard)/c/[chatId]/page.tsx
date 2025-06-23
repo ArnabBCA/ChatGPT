@@ -8,6 +8,7 @@ import axios from "axios";
 import { cn } from "@/lib/utils";
 import { useChatboxStore } from "@/store/chatbox-store";
 import RenderMessage from "@/components/chat/render-message";
+import Chatbox from "@/components/chat/chatbox";
 
 export default function ChatId() {
   const { chatId } = useParams();
@@ -115,26 +116,33 @@ export default function ChatId() {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col w-full items-center h-[calc(100vh-10.5rem)] overflow-y-auto py-5 pb-25 outline-0 ring-0 pr-2 pl-6 my-scrollbar"
-    >
-      <div className="flex flex-col gap-10 h-full w-full max-w-[48rem] mt-1.5">
-        {messages.map((msg) => (
-          <RenderMessage key={msg.id} msg={msg} />
-        ))}
-        {isThinking && (
-          <div>
-            <span className="inline-block w-3 h-3 rounded-full bg-white animate-[scaleUpDown_1.2s_ease-in-out_infinite]" />
-          </div>
-        )}
-        <div
-          ref={scrollRef}
-          className={cn(
-            "w-full",
-            messages.length > 2 ? "pb-[calc(100vh-300px)]" : "pb-25"
+    <div ref={containerRef} className="h-full w-full flex flex-col">
+      <div className="flex flex-col w-full items-center h-[calc(100vh-170px)] overflow-y-auto outline-0 ring-0 my-scrollbar px-6 relative">
+        <div className="flex flex-col gap-10 h-full w-full max-w-[48rem] mt-1.5">
+          {messages.map((msg) => (
+            <RenderMessage key={msg.id} msg={msg} />
+          ))}
+          {isThinking && (
+            <div>
+              <span className="inline-block w-3 h-3 rounded-full bg-white animate-[scaleUpDown_1.2s_ease-in-out_infinite]" />
+            </div>
           )}
-        />
+          <div
+            ref={scrollRef}
+            className={cn(
+              "w-full",
+              messages.length > 2 ? "pb-[calc(100vh-300px)]" : "pb-25"
+            )}
+          />
+        </div>
+        <Chatbox className="bottom-8 fixed" />
+        <div className="text-xs fixed bottom-0 w-full text-center min-h-8 p-2 md:px-[60px]">
+          ChatGPT can make mistakes. Check important info. See{" "}
+          <a href="#" className="underline">
+            Cookie Preferences
+          </a>
+          .
+        </div>
       </div>
     </div>
   );

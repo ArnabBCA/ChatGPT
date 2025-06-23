@@ -23,9 +23,7 @@ interface ChatboxState {
   setIsFinished: (value: boolean) => void;
 
   slideToBottom: boolean;
-  fixedToBottom: boolean;
   setSlideToBottom: (value: boolean) => void;
-  setFixedToBottom: (value: boolean) => void;
 
   isSubmited: boolean;
   setIsSubmited: (value: boolean) => void;
@@ -50,9 +48,7 @@ export const useChatboxStore = create<ChatboxState>()(
       setIsFinished: (value) => set({ isFinished: value }),
 
       slideToBottom: false,
-      fixedToBottom: false,
       setSlideToBottom: (value) => set({ slideToBottom: value }),
-      setFixedToBottom: (value) => set({ fixedToBottom: value }),
 
       isSubmited: false,
       setIsSubmited: (value) => set({ isSubmited: value }),
@@ -61,10 +57,6 @@ export const useChatboxStore = create<ChatboxState>()(
       name: "chatbox-storage",
       storage: createJSONStorage(() => localStorage),
       // Optional: only persist some fields
-      partialize: (state) => ({
-        slideToBottom: state.slideToBottom,
-        fixedToBottom: state.fixedToBottom,
-      }),
     }
   )
 );
