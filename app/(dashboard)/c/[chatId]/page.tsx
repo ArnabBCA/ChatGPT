@@ -19,6 +19,7 @@ export default function ChatId() {
   const [loading, setLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isFinishedState, setIsFinishedState] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const userInput = useChatboxStore((state) => state.userInput);
   const userFiles = useChatboxStore((state) => state.userFiles);
@@ -26,6 +27,7 @@ export default function ChatId() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   if (!chatId || typeof chatId !== "string") return null;
 
@@ -115,9 +117,28 @@ export default function ChatId() {
     }
   };
 
+  useEffect(() => {
+    const el = scrollAreaRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      setScrolled(el.scrollTop > 0);
+    };
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div ref={containerRef} className="h-full w-full flex flex-col">
-      <div className="flex flex-col w-full items-center h-[calc(100vh-170px)] overflow-y-auto outline-0 ring-0 my-scrollbar px-6 relative">
+    <div
+      ref={containerRef}
+      className={cn(
+        "h-full w-full flex flex-col",
+        scrolled && "shadow-xs shadow-neutral-400"
+      )}
+    >
+      <div
+        ref={scrollAreaRef}
+        className="flex flex-col w-full items-center h-[calc(100vh-170px)] overflow-y-auto outline-0 ring-0 my-scrollbar px-6 relative"
+      >
         <div className="flex flex-col gap-10 h-full w-full max-w-[48rem] mt-1.5">
           {messages.map((msg) => (
             <RenderMessage key={msg.id} msg={msg} />

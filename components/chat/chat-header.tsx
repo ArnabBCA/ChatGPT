@@ -1,5 +1,5 @@
 "use client";
-import { ChevronDown } from "lucide-react";
+import { AlignLeft, ChevronDown } from "lucide-react";
 import EditChatIcon from "../icons/edit-chat-icon";
 import { ThemeToggle } from "../theme-toggle";
 import { Button } from "../ui/button";
@@ -10,13 +10,12 @@ import axios from "axios";
 import { use, useEffect } from "react";
 
 export default function ChatHeader() {
-  const { open } = useSidebar();
+  const { open, isMobile, toggleSidebar } = useSidebar();
 
   const { setChats, setIsFinished } = useChatboxStore();
   const isFinished = useChatboxStore((state) => state.isFinished);
 
   const getAllChats = async () => {
-
     try {
       const res = await axios.get("/api/chats");
       setChats(res.data);
@@ -37,14 +36,14 @@ export default function ChatHeader() {
   return (
     <div className="header-height w-full p-2 flex items-center justify-between">
       <div className="flex items-center">
-        {!open && <SidebarTrigger />}
-        {!open && (
+        {isMobile && (
           <Button
             size={"icon"}
             variant={"ghost"}
             className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-[var(--menu-button-highlighted)]"
+            onClick={toggleSidebar}
           >
-            <EditChatIcon />
+            <AlignLeft />
           </Button>
         )}
         <Button

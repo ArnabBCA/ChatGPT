@@ -77,7 +77,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
   }, [pathname]);
 
   return (
-    <div className={cn(className, "w-full mx-auto")}>
+    <div className={cn(className, "w-full mx-auto px-6")}>
       <motion.div
         animate={pathname === "/" && slideToBottom && { y: yValue }}
         transition={{ type: "tween", duration: 0.25 }}
