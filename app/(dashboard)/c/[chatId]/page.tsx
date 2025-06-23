@@ -156,7 +156,7 @@ export default function ChatId() {
             )}
           />
         </div>
-        <Chatbox className="bottom-8 fixed" />
+        <Chatbox className="bottom-12 sm:bottom-8 fixed px-6" />
         <div className="text-xs fixed bottom-0 w-full text-center min-h-8 p-2 md:px-[60px]">
           ChatGPT can make mistakes. Check important info. See{" "}
           <a href="#" className="underline">
