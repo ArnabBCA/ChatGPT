@@ -66,9 +66,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
   }
 
   useEffect(() => {
-    if (pathname !== "/") {
-      setSlideToBottom(false);
-    }
+    setSlideToBottom(false);
     // Initial call
     updateChatboxPosition();
     // Add event listener
