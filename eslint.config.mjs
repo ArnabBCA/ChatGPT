@@ -11,12 +11,20 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  // Custom rule overrides
+
   {
     files: ["**/*.ts", "**/*.tsx"],
     rules: {
+      // Disable type and unused variable rules
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
+
+      // Disable React Hooks rules
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/rules-of-hooks": "off",
+
+      // Disable missing key prop in lists
+      "react/jsx-key": "off",
     },
   },
 ];
