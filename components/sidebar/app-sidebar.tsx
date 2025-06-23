@@ -135,7 +135,7 @@ export function AppSidebar() {
           <SidebarGroup className="px-0">
             <SidebarGroupContent>
               <SidebarMenu className="gap-0">
-                <CustomSidebarMenuItem text="Chats" />
+                {chats.length > 0 && <CustomSidebarMenuItem text="Chats" />}
                 {chats.map((chat) => (
                   <CustomSidebarMenuItem chat={chat} key={chat.chatId} />
                 ))}

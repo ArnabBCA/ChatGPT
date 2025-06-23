@@ -14,6 +14,7 @@ import axios from "axios";
 import { FileUploaderRegular } from "@uploadcare/react-uploader/next";
 import "@uploadcare/react-uploader/core.css";
 import { cn } from "@/lib/utils";
+import { ArrowUp } from "lucide-react";
 
 export default function Chatbox({ className = "" }: { className?: string }) {
   const [input, setInput] = useState("");
@@ -145,14 +146,25 @@ export default function Chatbox({ className = "" }: { className?: string }) {
               </Button>
 
               {/* Send Button */}
-              <Button
-                className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-200 dark:hover:!bg-neutral-500/80 rounded-full font-normal bg-[#00000014] dark:bg-[#ffffff29]"
-                variant={"ghost"}
-                size={"icon"}
-                onClick={(e) => handleSubmit(e)}
-              >
-                <VoiceIcon size={20} />
-              </Button>
+              {input.trim() ? (
+                <Button
+                  className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-300/85 hover:text-black rounded-full font-normal dark:bg-white text-black"
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={(e) => handleSubmit(e)}
+                >
+                  <ArrowUp size={20} />
+                </Button>
+              ) : (
+                <Button
+                  className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-200 dark:hover:!bg-neutral-500/80 rounded-full font-normal bg-[#00000014] dark:bg-[#ffffff29]"
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={(e) => handleSubmit(e)}
+                >
+                  <VoiceIcon size={20} />
+                </Button>
+              )}
             </div>
           </div>
         </form>

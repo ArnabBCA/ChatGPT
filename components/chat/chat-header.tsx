@@ -55,7 +55,7 @@ export default function ChatHeader() {
         </Button>
       </div>
       <div className="flex items-center gap-2">
-        <ThemeToggle />
+        {/*<ThemeToggle />*/}
         <SignedIn>
           <UserButton />
         </SignedIn>

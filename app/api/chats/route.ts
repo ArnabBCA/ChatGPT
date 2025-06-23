@@ -94,3 +94,36 @@ export async function PATCH(req: Request) {
     return new Response("Failed to update chat", { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  console.log("Received DELETE request for chat");
+  const { userId } = await auth();
+  if (!userId) return new Response("Unauthorized", { status: 401 });
+
+  const chatsCollection = await getChatsCollection();
+  const { chatId } = await req.json();
+  console.log("Received chatId:", chatId);
+
+  if (!chatId) {
+    return new Response("chatId is required", { status: 400 });
+  }
+
+  try {
+    const isValidChatId = await chatsCollection.findOne({
+      chatId,
+      userId,
+    });
+
+    console.log("isValidChatId:", isValidChatId);
+
+    if (!isValidChatId) {
+      return new Response("Invalid chatId", { status: 400 });
+    }
+
+    // Delete the chat
+    await chatsCollection.deleteOne({ chatId, userId });
+    return Response.json("Chat deleted successfully", { status: 200 });
+  } catch (error) {
+    return new Response("Failed to validate chatId", { status: 500 });
+  }
+}
