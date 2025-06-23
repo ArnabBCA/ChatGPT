@@ -96,14 +96,11 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  console.log("Received DELETE request for chat");
   const { userId } = await auth();
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
   const chatsCollection = await getChatsCollection();
   const { chatId } = await req.json();
-  console.log("Received chatId:", chatId);
-
   if (!chatId) {
     return new Response("chatId is required", { status: 400 });
   }
@@ -113,8 +110,6 @@ export async function DELETE(req: Request) {
       chatId,
       userId,
     });
-
-    console.log("isValidChatId:", isValidChatId);
 
     if (!isValidChatId) {
       return new Response("Invalid chatId", { status: 400 });
