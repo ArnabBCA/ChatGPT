@@ -14,8 +14,7 @@ Install dependencies:
 npm install
 ```
 
-Download the `ca.pem` file from the `Aiven console` and put it inside `prisma` folder: </br>
-Create a new `.env` file in the root folder Add add the following:
+Create a new `.env.local` file in the root folder Add add the following:
 
 ```bash
 GEMINI_API_KEY=(YOUR KEY)
