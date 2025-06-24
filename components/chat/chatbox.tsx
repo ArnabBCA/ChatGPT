@@ -93,6 +93,9 @@ export default function Chatbox({ className = "" }: { className?: string }) {
           pathname === "/" && !isMobile && slideToBottom && { y: yValue }
         }
         transition={{ type: "tween", duration: 0.25 }}
+        onAnimationComplete={() => {
+          setSlideToBottom(false);
+        }}
         className={"mx-auto flex w-full flex-col max-w-[48rem] items-center"}
         ref={chatboxRef}
       >
@@ -100,7 +103,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
           onSubmit={handleSubmit}
           className="w-full rounded-[28px] overflow-hidden p-2.5 dark:bg-[#303030] shadow-short"
         >
-          {uploadcarefiles.length !== 0 && (
+          {!slideToBottom && uploadcarefiles.length !== 0 && (
             <div className="w-full p-1 flex gap-2">
               {uploadcarefiles.map((file) => {
                 const isImage = file.contentType.startsWith("image/");
@@ -161,6 +164,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
             <div className="flex items-center gap-[1px]">
               <div className="relative min-w-[120.68px] min-h-[32.4px]">
                 <FileUploaderRegular
+                  classNameUploader="uc-dark"
                   apiRef={uploaderRef}
                   key={userFiles.length}
                   className="absolute"
