@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import SlidersIcon from "../icons/sliders-icon";
-import PlusIcon from "../icons/plus-icon";
 import MicIcon from "../icons/mic-icon";
 import VoiceIcon from "../icons/voice-icon";
 import { useChatboxStore } from "@/store/chatbox-store";
@@ -20,7 +19,7 @@ import { useSidebar } from "../ui/sidebar";
 export default function Chatbox({ className = "" }: { className?: string }) {
   const [input, setInput] = useState("");
   const [uploadcarefiles, setUploadcareFiles] = useState<any[]>([]);
-  const chatboxRef = useRef<HTMLDivElement>(null); // ✅ Ref to measure height
+  const chatboxRef = useRef<HTMLDivElement>(null);
   const [yValue, setYValue] = useState(0);
 
   const pathname = usePathname();
@@ -30,6 +29,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
 
   const { setUserInput, setUserFiles, slideToBottom, setSlideToBottom } =
     useChatboxStore();
+  const userFiles = useChatboxStore((state) => state.userFiles);
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("handleSubmit called");
@@ -104,9 +104,9 @@ export default function Chatbox({ className = "" }: { className?: string }) {
           />
           <div className="w-full flex items-center justify-between mt-2">
             <div className="flex items-center gap-[1px]">
-              {/* Uploadcare file uploader */}
               <div className="relative min-w-[120.68px] min-h-[32.4px]">
                 <FileUploaderRegular
+                  key={userFiles.length}
                   className="absolute"
                   useCloudImageEditor={false}
                   sourceList="local, gdrive"
@@ -124,8 +124,6 @@ export default function Chatbox({ className = "" }: { className?: string }) {
                   }}
                 />
               </div>
-
-              {/* Tools Button */}
               <Button
                 className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal flex items-center gap-1.5 !px-2"
                 variant={"ghost"}
@@ -137,7 +135,6 @@ export default function Chatbox({ className = "" }: { className?: string }) {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Mic Button */}
               <Button
                 className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-100/50 dark:hover:!bg-neutral-700 rounded-full font-normal size-8"
                 variant={"ghost"}
@@ -146,8 +143,6 @@ export default function Chatbox({ className = "" }: { className?: string }) {
               >
                 <MicIcon size={20} />
               </Button>
-
-              {/* Send Button */}
               {input.trim() ? (
                 <Button
                   className="[&_svg]:!w-auto [&_svg]:!h-auto hover:!bg-neutral-300/85 hover:text-black rounded-full font-normal dark:bg-white text-black"
