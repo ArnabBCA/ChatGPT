@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { appendClientMessage, appendResponseMessages, streamText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getChatsCollection, getMessagesCollection } from "@/lib/collection";
+import { MemoryClient } from "mem0ai";
 
 export async function GET(req: Request) {
   const { userId } = await auth();
@@ -108,10 +109,22 @@ export async function POST(req: Request) {
     message,
   });
 
+  const memory = new MemoryClient({
+    apiKey: process.env.MEM0_API_KEY!,
+  });
+  const searchResult = await memory.search(message.content, {
+    user_id: userId,
+  });
+
+  const relevant = searchResult.map((r) => r.memory).join("\n");
+  const systemPrompt = relevant
+    ? `These are things I remember about you:\n${relevant}`
+    : "You are a helpful AI assistant.";
+
   const result = streamText({
     model: google("models/gemini-2.0-flash"),
-    messages,
-    async onFinish({ response }) {
+    messages: [{ role: "system", content: systemPrompt }, ...messages],
+    async onFinish({ response, text }) {
       await messagesCollection.findOneAndUpdate(
         { chatId: id },
         {
@@ -126,6 +139,11 @@ export async function POST(req: Request) {
           upsert: true,
         }
       );
+      const convo: { role: "user" | "assistant"; content: any }[] = [
+        { role: "user", content: message.content },
+        { role: "assistant", content: text },
+      ];
+      await memory.add(convo, { user_id: userId });
     },
   });
 
