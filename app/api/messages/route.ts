@@ -71,6 +71,9 @@ export async function POST(req: Request) {
   const google = createGoogleGenerativeAI({
     apiKey: process.env.GEMINI_API_KEY!,
   });
+  const memory = new MemoryClient({
+    apiKey: process.env.MEM0_API_KEY!,
+  });
 
   const { message, id } = await req.json();
 
@@ -109,9 +112,6 @@ export async function POST(req: Request) {
     message,
   });
 
-  const memory = new MemoryClient({
-    apiKey: process.env.MEM0_API_KEY!,
-  });
   const searchResult = await memory.search(message.content, {
     user_id: userId,
   });
