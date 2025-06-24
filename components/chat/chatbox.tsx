@@ -118,10 +118,10 @@ export default function Chatbox({ className = "" }: { className?: string }) {
                     )}
                   >
                     <div
-                      className="absolute cursor-pointer top-2 right-2 text-black bg-white rounded-full"
+                      className="absolute cursor-pointer top-2 right-2 text-black bg-white rounded-full p-0.25"
                       onClick={() => deleteFile(file.internalId)}
                     >
-                      <X size={12} />
+                      <X size={14} />
                     </div>
 
                     {isImage ? (
@@ -130,6 +130,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
                         height={100}
                         width={100}
                         alt={file.name || "Uploaded file"}
+                        className="object-cover h-full w-full"
                       />
                     ) : (
                       <>
