@@ -3,6 +3,7 @@ import { appendClientMessage, appendResponseMessages, streamText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { getChatsCollection, getMessagesCollection } from "@/lib/collection";
 import { MemoryClient } from "mem0ai";
+import { countTokens, fitMessagesWithinContextWindow } from "@/lib/utils";
 
 export async function GET(req: Request) {
   const { userId } = await auth();
@@ -107,9 +108,22 @@ export async function POST(req: Request) {
     }
   };
 
+  let allOldMessages: any = [];
+
+  if (process.env.ENABLE_MAX_TOKEN_CONTEXT_WINDOW === "true") {
+    allOldMessages = fitMessagesWithinContextWindow([...allOldMessages]);
+  } else {
+    allOldMessages = await getAllOldMessages();
+  }
+  
+  const updatedMessage = {
+    ...message,
+    promptTokens: countTokens(message.content),
+  };
+
   const messages = appendClientMessage({
-    messages: await getAllOldMessages(),
-    message,
+    messages: allOldMessages,
+    message: updatedMessage,
   });
 
   const searchResult = await memory.search(message.content, {
@@ -124,16 +138,23 @@ export async function POST(req: Request) {
   const result = streamText({
     model: google("models/gemini-2.0-flash"),
     messages: [{ role: "system", content: systemPrompt }, ...messages],
-    async onFinish({ response, text }) {
+    async onFinish({ response, text, usage }) {
+      const allMessages = appendResponseMessages({
+        messages,
+        responseMessages: response.messages,
+      });
+      const lastMessage = allMessages[allMessages.length - 1];
+      const lastMessageWithUsage = {
+        ...lastMessage,
+        usage: usage,
+      };
+      allMessages[allMessages.length - 1] = lastMessageWithUsage;
       try {
         await messagesCollection.findOneAndUpdate(
           { chatId: id },
           {
             $set: {
-              messages: appendResponseMessages({
-                messages,
-                responseMessages: response.messages,
-              }),
+              messages: allMessages,
             },
           },
           { upsert: true }

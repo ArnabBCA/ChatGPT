@@ -25,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.18.1",
+    "js-tiktoken": "^1.0.20",
     "lucide-react": "^0.516.0",
     "mem0ai": "^2.1.33",
     "mongodb": "^6.17.0",
