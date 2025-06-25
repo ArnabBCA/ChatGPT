@@ -100,8 +100,8 @@ export async function POST(req: Request) {
 
   const getAllOldMessages = async () => {
     try {
-      const chat = await messagesCollection.find({ chatId: id }).toArray();
-      return chat[0]?.messages || [];
+      const chat = await messagesCollection.findOne({ chatId: id });
+      return chat?.messages || [];
     } catch (error) {
       console.error("Failed to get all old messages:", error);
     }
@@ -125,25 +125,30 @@ export async function POST(req: Request) {
     model: google("models/gemini-2.0-flash"),
     messages: [{ role: "system", content: systemPrompt }, ...messages],
     async onFinish({ response, text }) {
-      await messagesCollection.findOneAndUpdate(
-        { chatId: id },
-        {
-          $set: {
-            messages: appendResponseMessages({
-              messages,
-              responseMessages: response.messages,
-            }),
+      try {
+        await messagesCollection.findOneAndUpdate(
+          { chatId: id },
+          {
+            $set: {
+              messages: appendResponseMessages({
+                messages,
+                responseMessages: response.messages,
+              }),
+            },
           },
-        },
-        {
-          upsert: true,
-        }
-      );
-      const convo: { role: "user" | "assistant"; content: any }[] = [
-        { role: "user", content: message.content },
-        { role: "assistant", content: text },
-      ];
-      await memory.add(convo, { user_id: userId });
+          { upsert: true }
+        );
+
+        await memory.add(
+          [
+            { role: "user", content: message.content },
+            { role: "assistant", content: text },
+          ],
+          { user_id: userId }
+        );
+      } catch (error) {
+        console.error("Error saving response or memory:", error);
+      }
     },
   });
 
