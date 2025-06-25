@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { getChatsCollection } from "@/lib/collection";
+import { getChatsCollection, getMessagesCollection } from "@/lib/collection";
 
 export async function GET() {
   const { userId } = await auth();
@@ -100,6 +100,7 @@ export async function DELETE(req: Request) {
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
   const chatsCollection = await getChatsCollection();
+  const messagesCollection = await getMessagesCollection();
   const { chatId } = await req.json();
   if (!chatId) {
     return new Response("chatId is required", { status: 400 });
@@ -115,8 +116,9 @@ export async function DELETE(req: Request) {
       return new Response("Invalid chatId", { status: 400 });
     }
 
-    // Delete the chat
+    // Delete the chat and its messages
     await chatsCollection.deleteOne({ chatId, userId });
+    await messagesCollection.deleteOne({ chatId });
     return Response.json("Chat deleted successfully", { status: 200 });
   } catch (error) {
     return new Response("Failed to validate chatId", { status: 500 });
