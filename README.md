@@ -26,6 +26,10 @@ MONGODB_URI=(YOUR KEY)
 
 UPLOADCARE_SECRET_KEY=(YOUR KEY)
 NEXT_PUBLIC_UPLOADCARE_PUB_KEY=(YOUR KEY)
+
+NEXT_PUBLIC_MAX_TOKEN_CONTEXT_WINDOW=10000 # ANY VALUE DEFAULT is 10000
+
+NEXT_PUBLIC_ENABLE_MAX_TOKEN_CONTEXT_WINDOW=false #DEFAULT is false
 ```
 
 Run the development server:
@@ -39,7 +43,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## 🌟 Features
 
 ✅ **Integrated Vercel AI SDK:**<br>
-✅ **Gemini AI:**<br>
+✅ **Gemini AI**<br>
+✅ **Added memory using mem0.ai**<br>
+✅ **Max Token Contex Window Handling**<br>
 ✅ **MongoDB for message Storage**<br>
 ✅ **Supports file and image uploads to the AI**<br>
 ✅ **Message History and Message persistence**<br>
