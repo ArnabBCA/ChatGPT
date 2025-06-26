@@ -16,16 +16,16 @@ export default function ChatId() {
   const { setUserInput, setUserFiles, setIsFinished, setEditedMessage } =
     useChatboxStore();
 
-  const [loading, setLoading] = useState(false);
-  const [isThinking, setIsThinking] = useState(false);
-  const [isFinishedState, setIsFinishedState] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [loading, setLoading] = useState(false); //For fetching old messages
+  const [isThinking, setIsThinking] = useState(false); // When AI is generating a response
+  const [isFinishedState, setIsFinishedState] = useState(false); // When AI has finished generating a response
+  const [scrolled, setScrolled] = useState(false); //For adding a shadow to the chat container when scrolled
 
   const userInput = useChatboxStore((state) => state.userInput);
   const userFiles = useChatboxStore((state) => state.userFiles);
   const editedMessage = useChatboxStore((state) => state.editedMessage);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null); //For automatically scrolling to the bottom of the chat
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -39,8 +39,8 @@ export default function ChatId() {
       message: messages[messages.length - 1],
       id,
     }),
-    onFinish: () => setIsFinishedState(true),
-    onResponse: () => setIsThinking(false),
+    onFinish: () => setIsFinishedState(true), //Update the local state when AI finishes generating a response
+    onResponse: () => setIsThinking(false), // Set thinking state to false when AI responds
   });
 
   const fetchOldMessages = async () => {
@@ -48,7 +48,7 @@ export default function ChatId() {
       setLoading(true);
       const res = await axios.get(`/api/messages?chatId=${chatId}`);
       if (res.data.length === 0) return;
-      setMessages(res.data);
+      setMessages(res.data); // Set the initial messages in the chat
     } catch (error) {
       console.error("Fetching messages failed:", error);
     } finally {
@@ -71,24 +71,24 @@ export default function ChatId() {
 
   useEffect(() => {
     if (userInput?.trim() || userFiles?.length) {
-      setIsThinking(true);
+      setIsThinking(true); // Set thinking state true when user gives input
       append({
         role: "user",
         content: userInput ?? "",
-        experimental_attachments: userFiles,
+        experimental_attachments: userFiles, //for sending files
       });
       setUserInput("");
       setUserFiles([]);
     }
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" }); // Scroll to the bottom when a new message is added
   }, [userInput, userFiles]);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "instant" });
+    scrollRef.current?.scrollIntoView({ behavior: "instant" }); // When refreshing the page, scroll to the bottom
   }, [loading]);
 
   useEffect(() => {
-    setIsFinished(isFinishedState);
+    setIsFinished(isFinishedState); // Update the global state when AI finishes generating a response
   }, [isFinishedState]);
 
   const handleEdit = async () => {
@@ -97,8 +97,8 @@ export default function ChatId() {
       editedMessage.id,
       chatId as string
     );
-    setMessages(updatedMessages);
-    setUserInput(editedMessage.content);
+    setMessages(updatedMessages); // Update the messages in the chat
+    setUserInput(editedMessage.content); // Set the user input to the edited message content
     setEditedMessage({ id: "", content: "" });
   };
 

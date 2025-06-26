@@ -1,18 +1,16 @@
 "use client";
 import { AlignLeft, ChevronDown } from "lucide-react";
-import EditChatIcon from "../icons/edit-chat-icon";
-import { ThemeToggle } from "../theme-toggle";
 import { Button } from "../ui/button";
-import { SidebarTrigger, useSidebar } from "../ui/sidebar";
+import { useSidebar } from "../ui/sidebar";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { useChatboxStore } from "@/store/chatbox-store";
 import axios from "axios";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function ChatHeader() {
-  const { open, isMobile, toggleSidebar } = useSidebar();
+  const { isMobile, toggleSidebar } = useSidebar();
 
-  const { setChats, setIsFinished } = useChatboxStore();
+  const { setChats } = useChatboxStore();
   const isFinished = useChatboxStore((state) => state.isFinished);
 
   const getAllChats = async () => {
@@ -26,7 +24,7 @@ export default function ChatHeader() {
 
   useEffect(() => {
     if (!isFinished) return;
-    getAllChats();
+    getAllChats(); // Only fetch chats to update (UI) after getting response from the AI
   }, [isFinished]);
 
   useEffect(() => {

@@ -24,7 +24,7 @@ import { Images, Search, SquarePen } from "lucide-react";
 
 export function AppSidebar() {
   const chats = useChatboxStore((state) => state.chats);
-  const { open, isMobile } = useSidebar();
+  const { open } = useSidebar();
 
   return (
     <Sidebar

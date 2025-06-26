@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const chats = await chatsCollection
       .find({ userId })
-      .sort({ updatedAt: -1 })
+      .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order (most recent first)
       .toArray();
 
     return Response.json(chats || [], { status: 200 });

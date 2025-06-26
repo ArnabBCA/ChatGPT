@@ -36,14 +36,13 @@ export default function Chatbox({ className = "" }: { className?: string }) {
   const uploaderRef = useRef<InstanceType<UploadCtxProvider> | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("handleSubmit called");
     e.preventDefault();
 
     const trimmed = input.trim();
     if (!trimmed) return;
 
     setUserInput(trimmed);
-    setSlideToBottom(true);
+    setSlideToBottom(true); // For starting animation
 
     if (!chatId) {
       try {
@@ -66,9 +65,9 @@ export default function Chatbox({ className = "" }: { className?: string }) {
     api?.removeFileByInternalId(internalId);
   };
 
-  function updateChatboxPosition() {
-    const chatboxHeight = chatboxRef.current?.offsetHeight ?? 0;
-    const chatboxYpos = chatboxRef.current?.getBoundingClientRect().y ?? 0;
+  function updateChatboxPosition() { //For animation
+    const chatboxHeight = chatboxRef.current?.offsetHeight ?? 0; // Get the height of the chatbox
+    const chatboxYpos = chatboxRef.current?.getBoundingClientRect().y ?? 0; // Get the Y position of the chatbox relative to the viewport
     const windowHeight = window.innerHeight;
     const targetY = windowHeight - chatboxYpos - chatboxHeight - 24; // 24px bottom margin
     setYValue(targetY);
@@ -90,7 +89,7 @@ export default function Chatbox({ className = "" }: { className?: string }) {
     <div className={cn(className, "w-full mx-auto")}>
       <motion.div
         animate={
-          pathname === "/" && !isMobile && slideToBottom && { y: yValue }
+          pathname === "/" && !isMobile && slideToBottom && { y: yValue } //Only animate when on home page and not mobile
         }
         transition={{ type: "tween", duration: 0.25 }}
         onAnimationComplete={() => {

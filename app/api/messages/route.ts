@@ -32,7 +32,6 @@ export async function DELETE(req: Request) {
   const messagesCollection = await getMessagesCollection();
 
   try {
-    // Get the chat by unique chatId (userId not needed in query anymore)
     const chat = await messagesCollection.findOne({ chatId });
 
     if (!chat) return new Response("Chat not found", { status: 404 });
@@ -116,7 +115,7 @@ export async function POST(req: Request) {
     allOldMessages = await getAllOldMessages();
   }
   
-  const updatedMessage = {
+  const updatedMessage = { //update the user message with tokens count
     ...message,
     promptTokens: countTokens(message.content),
   };
@@ -148,7 +147,7 @@ export async function POST(req: Request) {
         ...lastMessage,
         usage: usage,
       };
-      allMessages[allMessages.length - 1] = lastMessageWithUsage;
+      allMessages[allMessages.length - 1] = lastMessageWithUsage; // Update last message with usage info
       try {
         await messagesCollection.findOneAndUpdate(
           { chatId: id },

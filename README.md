@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 Fork the repository (For first time)
 
 ```bash
-git clone https://github.com/100x-Devs/Learning-Management-System
+git clone https://github.com/ArnabBCA/ChatGPT.git
 ```
 
 Install dependencies:
@@ -27,7 +27,9 @@ MONGODB_URI=(YOUR KEY)
 UPLOADCARE_SECRET_KEY=(YOUR KEY)
 NEXT_PUBLIC_UPLOADCARE_PUB_KEY=(YOUR KEY)
 
-NEXT_PUBLIC_MAX_TOKEN_CONTEXT_WINDOW=10000 # ANY VALUE DEFAULT is 10000
+MEM0_API_KEY=(YOUR KEY)
+
+NEXT_PUBLIC_MAX_TOKEN_CONTEXT_WINDOW=10000 #ANY VALUE DEFAULT is 10000
 
 NEXT_PUBLIC_ENABLE_MAX_TOKEN_CONTEXT_WINDOW=false #DEFAULT is false
 ```

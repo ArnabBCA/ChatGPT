@@ -16,12 +16,12 @@ export default function RenderMessage({ msg }: { msg: any }) {
   const { setEditedMessage } = useChatboxStore();
 
   const handleEditMessage = () => {
-    setEditedMessage({ id: msg.id, content: textContent });
-    setIsEditing(false);
+    setEditedMessage({ id: msg.id, content: textContent }); // Update the message content in the store
+    setIsEditing(false); // Exit editing mode (closes the textarea)
   };
 
   useEffect(() => {
-    setTextContent(msg.content || "");
+    setTextContent(msg.content || ""); // Initialize textContent with the message content
   }, [msg]);
 
   return (
